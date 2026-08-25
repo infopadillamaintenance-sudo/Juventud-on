@@ -172,6 +172,65 @@ Para que funcione de verdad como comunidad hace falta:
 
 ---
 
+## Publicar en Vercel
+
+El sitio es estático puro: no hay que compilar nada en el servidor porque el CSS ya va
+compilado en el repositorio. Lo que se publica son **244 KB** en total (`index.html` +
+`assets/`); el resto de carpetas quedan fuera vía `.vercelignore`.
+
+La configuración ya está hecha en `vercel.json`. No hay que tocar nada en el panel.
+
+### Conectarlo (una sola vez)
+
+1. Entra en [vercel.com](https://vercel.com) e inicia sesión **con la cuenta de GitHub**
+   que es dueña del repositorio.
+2. **Add New → Project** e importa `infopadillamaintenance-sudo/Juventud-on`.
+3. Vercel leerá `vercel.json` solo. Pulsa **Deploy**.
+4. En un minuto tendrás una URL tipo `juventud-on.vercel.app`.
+
+### Rama de producción
+
+Ahora mismo todo el código vive en la rama `claude/revisar-tareas-pendientes-cg0s5x`, que
+es la única del repositorio. Dos caminos:
+
+- **Recomendado:** fusionar esa rama a `main` y dejar `main` como rama de producción. Es lo
+  normal y evita tener una rama de producción con nombre de trabajo.
+- **Rápido:** en *Settings → Git → Production Branch* poner
+  `claude/revisar-tareas-pendientes-cg0s5x`. Funciona igual, pero queda feo a la larga.
+
+### A partir de ahí, actualizar es solo esto
+
+```bash
+git add .
+git commit -m "lo que cambiaste"
+git push
+```
+
+Cada `push` a la rama de producción vuelve a publicar el sitio automáticamente, en unos
+segundos. Los `push` a otras ramas generan una URL de vista previa, útil para revisar un
+cambio antes de que lo vea todo el mundo.
+
+### Caché
+
+Está configurada pensando en que vas a actualizar seguido:
+
+| Qué | Caché |
+|---|---|
+| Tipografías (`assets/fonts/`) | 1 año — nunca cambian |
+| Fotos (`assets/img/`) | 1 semana |
+| HTML, CSS y JS | Sin caché: los cambios se ven al instante |
+
+Así, cuando cambies un devocional o un anuncio, quien abra la web lo ve enseguida sin tener
+que vaciar la caché del navegador.
+
+### Dominio propio
+
+Si algún día quieren `juventudon.com` o similar: *Settings → Domains* en el proyecto de
+Vercel, y se apunta el dominio siguiendo las instrucciones que da ahí. El plan gratuito
+admite dominio propio.
+
+---
+
 ## Créditos
 
 - Tipografías **Anton** e **Inter**, licencia SIL Open Font License 1.1, autohospedadas en
