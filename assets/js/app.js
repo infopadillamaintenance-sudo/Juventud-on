@@ -44,11 +44,17 @@
   const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
   const DIAS_LARGOS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
 
-  /** Muestra un dato real o un placeholder resaltado si sigue en [COMPLETAR]. */
-  const dato = (valor, pista) =>
-    valor === PENDIENTE || valor == null
-      ? `<span class="font-semibold text-ambar-500" data-pendiente>[COMPLETAR]${pista ? " " + esc(pista) : ""}</span>`
-      : esc(valor);
+  /**
+   * Muestra un dato real, un placeholder resaltado si sigue en [COMPLETAR],
+   * o nada en absoluto si es null (el ministerio no tiene ese dato).
+   */
+  const dato = (valor, pista) => {
+    if (valor == null) return "";
+    if (valor === PENDIENTE) {
+      return `<span class="font-semibold text-ambar-500" data-pendiente>[COMPLETAR]${pista ? " " + esc(pista) : ""}</span>`;
+    }
+    return esc(valor);
+  };
 
   let temporizadorToast;
   function toast(mensaje) {
@@ -156,32 +162,48 @@
         <p class="mt-1 text-sm text-white/55">${esc(v.texto)}</p>
       </article>`).join("");
 
-    $("#txt-direccion").innerHTML = dato(CONFIG.ubicacion.direccion, "· dirección exacta");
+    $("#txt-edades").textContent = CONFIG.edades ? `Para jóvenes de ${CONFIG.edades}` : "";
 
-    $("#lista-contacto").innerHTML = [
+    // Dirección, con enlace a Google Maps si lo hay
+    $("#txt-direccion").innerHTML = dato(CONFIG.ubicacion.direccion, "· dirección exacta") +
+      (CONFIG.ubicacion.mapa
+        ? ` · <a href="${CONFIG.ubicacion.mapa}" target="_blank" rel="noopener"
+             class="font-semibold text-cian-400 underline underline-offset-2">Cómo llegar</a>`
+        : "");
+
+    // El Instagram va primero porque es el canal por el que sí responden.
+    // Las filas con valor null (no existen) se omiten enteras, sin dejar hueco.
+    const contacto = [
+      ["📸", "Instagram", `<a href="${CONFIG.redes.instagram.url}" target="_blank" rel="noopener"
+            class="font-semibold text-white underline underline-offset-2">${esc(CONFIG.redes.instagram.handle)}</a>
+            <span class="text-white/45">— escríbenos por mensaje directo</span>`],
       ["✉️", "Correo", CONFIG.contacto.email],
-      ["💬", "WhatsApp", CONFIG.contacto.whatsapp]
-    ].map(([ic, etiqueta, valor]) => `
+      ["💬", "WhatsApp", CONFIG.contacto.whatsapp],
+      ["📞", "Teléfono", CONFIG.contacto.telefono]
+    ].filter(([, , valor]) => valor != null);
+
+    $("#lista-contacto").innerHTML = contacto.map(([ic, etiqueta, valor], i) => `
       <li class="flex gap-3"><span aria-hidden="true">${ic}</span>
         <span><strong class="text-white">${etiqueta}</strong><br>
-        <span class="text-sm">${dato(valor)}</span></span></li>`).join("");
+        <span class="text-sm">${i === 0 ? valor : dato(valor)}</span></span></li>`).join("");
 
-    const redes = [
-      ["Instagram", CONFIG.redes.instagram.url, CONFIG.redes.instagram.handle],
-      ["La iglesia", CONFIG.redes.instagramIglesia.url, CONFIG.redes.instagramIglesia.handle]
-    ].map(([n, url, handle]) => `
-      <a href="${url}" target="_blank" rel="noopener"
+    // Solo las redes que el ministerio realmente tiene. El Instagram propio no
+    // se repite aquí: ya aparece arriba como vía de contacto.
+    $("#lista-redes").innerHTML = [
+      ["La iglesia", CONFIG.redes.instagramIglesia]
+    ].filter(([, r]) => r && r.url).map(([n, r]) => `
+      <a href="${r.url}" target="_blank" rel="noopener"
          class="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10">
-         ${n} <span class="text-white/45">${esc(handle)}</span></a>`);
-
-    const faltantes = [["TikTok", CONFIG.redes.tiktok], ["YouTube", CONFIG.redes.youtube], ["Facebook", CONFIG.redes.facebook]]
-      .filter(([, v]) => v === PENDIENTE)
-      .map(([n]) => `<span class="rounded-full border border-ambar-500/30 bg-ambar-500/10 px-4 py-2 text-sm font-semibold text-ambar-500" data-pendiente>${n} [COMPLETAR]</span>`);
-
-    $("#lista-redes").innerHTML = redes.concat(faltantes).join("");
+         ${n} <span class="text-white/45">${esc(r.handle)}</span></a>`).join("");
   }
 
   /* ---------------------------------------------------------------- racha: devocional */
+
+  /** Tiempo de lectura estimado (~180 palabras por minuto), mínimo 1 minuto. */
+  function minutosDeLectura(d) {
+    const palabras = [d.versiculo].concat(d.reflexion, d.reto || []).join(" ").split(/\s+/).length;
+    return Math.max(1, Math.round(palabras / 180));
+  }
 
   /** Devocional del día: rota por día del año, así todos ven el mismo. */
   function devocionalDeHoy() {
@@ -231,12 +253,17 @@
 
     const f = new Date();
     $("#dev-fecha").textContent = `${DIAS_LARGOS[f.getDay()]} ${f.getDate()} de ${MESES[f.getMonth()]}`;
-    $("#dev-duracion").textContent = `${d.minutos} min de lectura`;
+    $("#dev-duracion").textContent = `${d.minutos || minutosDeLectura(d)} min de lectura`;
     $("#dev-titulo").textContent = d.titulo;
     $("#dev-versiculo").textContent = `“${d.versiculo}”`;
     $("#dev-ref").textContent = d.ref + " (RVR1960)";
     $("#dev-reflexion").innerHTML = d.reflexion.map((p) => `<p>${esc(p)}</p>`).join("");
-    $("#dev-reto").textContent = d.reto;
+    // El reto es opcional: el contenido oficial del liderazgo no lo trae
+    $("#dev-reto-bloque").classList.toggle("hidden", !d.reto);
+    if (d.reto) $("#dev-reto").textContent = d.reto;
+
+    // El aviso de "contenido de ejemplo" solo aparece si aún no está revisado
+    $("#dev-aviso").classList.toggle("hidden", d.revisado === true);
 
     const btn = $("#btn-devocional");
     btn.disabled = hecho;
@@ -635,8 +662,15 @@
 
       const anuncio = e.target.closest("[data-anuncio]");
       if (anuncio) {
-        if (anuncio.dataset.anuncio === "ir-racha") { ir("racha"); }
-        else { ir("inicio"); setTimeout(() => $("#info").scrollIntoView({ behavior: "smooth" }), 60); }
+        const accion = anuncio.dataset.anuncio;
+        if (accion === "ir-racha") {
+          ir("racha");
+        } else if (accion === "instagram") {
+          window.open(CONFIG.redes.instagram.url, "_blank", "noopener");
+        } else {
+          ir("inicio");
+          setTimeout(() => $("#info").scrollIntoView({ behavior: "smooth" }), 60);
+        }
         return;
       }
 

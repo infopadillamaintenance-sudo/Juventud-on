@@ -4,10 +4,15 @@
    TODO lo editable del sitio vive en este archivo. No hace falta tocar el HTML
    para cambiar horarios, anuncios, devocionales, equipos o retos.
 
-   ⚠ El valor PENDIENTE marca datos reales que todavía no se han confirmado
-   (ver contexto/02-informacion-practica.md). Están a propósito: no se inventan
-   direcciones, teléfonos ni correos. Sustituye PENDIENTE por el dato real y
-   la web lo muestra automáticamente.
+   Hay dos marcadores distintos y NO significan lo mismo:
+
+     PENDIENTE  → el dato existe pero todavía no se ha confirmado. Sale en la
+                  web resaltado en ámbar como [COMPLETAR]. Sustitúyelo por el
+                  dato real y aparece solo.
+     null       → el ministerio NO tiene ese dato (por ejemplo, no hay TikTok).
+                  La web omite la fila entera, sin dejar hueco ni marcador.
+
+   Nunca se inventan direcciones, teléfonos ni correos.
    ========================================================================== */
 
 const PENDIENTE = "[COMPLETAR]";
@@ -23,21 +28,19 @@ const CONFIG = {
   // Tomado literal de la bio de Instagram
   bioInstagram: "Grupo de jóvenes en @odresaruba — Todos los viernes a las 7:30pm",
 
-  // BORRADOR sugerido en contexto/01 — el liderazgo debe confirmar o reemplazar
+  // Confirmados por el liderazgo
   mision:
-    "Acercar a los jóvenes a la Palabra de Dios de una manera relevante, dinámica y cercana a su generación, formando una comunidad de jóvenes comprometidos con su fe.",
+    "Llevar a los jóvenes a tener un encuentro personal y real con Jesús en un ambiente lleno de alegría, dinamismo y diversión.",
   vision:
-    "Ser una comunidad juvenil referente que impacte a una nueva generación de jóvenes con el mensaje de Cristo, dentro y fuera de la iglesia.",
+    "Ser una comunidad de jóvenes unidos donde podamos disfrutar, ser auténticos y crecer juntos espiritualmente, demostrando que seguir a Cristo es la mejor aventura.",
   valores: [
-    { icono: "📖", titulo: "Fe real", texto: "Compromiso con la Palabra, no con la apariencia." },
-    { icono: "🤝", titulo: "Comunidad", texto: "Aquí nadie camina solo." },
-    { icono: "💯", titulo: "Autenticidad", texto: "Vivir la fe sin fingir." },
-    { icono: "🙌", titulo: "Servicio", texto: "A la iglesia, a la comunidad y entre nosotros." },
-    { icono: "⚡", titulo: "Excelencia", texto: "Damos lo mejor en todo lo que hacemos." },
-    { icono: "🎉", titulo: "Diversión con propósito", texto: "Reír juntos también nos acerca." }
+    { icono: "🤝", titulo: "Amistad", texto: "Crear lazos fuertes y verdaderos entre nosotros." },
+    { icono: "🎉", titulo: "Diversión sana", texto: "Disfrutar cada momento juntos con alegría y energía." },
+    { icono: "🙌", titulo: "Fe auténtica", texto: "Conocer a Jesús de una manera real y aplicable a nuestra vida diaria." }
   ],
-  lema: PENDIENTE, // ¿existe un lema o versículo oficial del ministerio?
-  edades: PENDIENTE, // rango de edad del ministerio (ej. 13-25 años)
+
+  edades: "13 a 25 años",
+  lema: null, // el ministerio no tiene lema ni versículo oficial por ahora
 
   servicio: {
     dia: "Viernes",
@@ -46,42 +49,69 @@ const CONFIG = {
     horas: 19,
     minutos: 30,
     lugar: "Iglesia Odres Nuevos",
-    ciudad: "Aruba"
+    ciudad: "Aruba",
+    entreSemana: null // no hay actividad los jueves ni entre semana
   },
 
   ubicacion: {
-    direccion: PENDIENTE, // calle / edificio exacto en Aruba
-    mapa: PENDIENTE // enlace de Google Maps
+    direccion: "Paradera 4, Aruba",
+    mapa: "https://maps.google.com/?q=Paradera+4,+Aruba"
   },
 
   contacto: {
+    // Sigue PENDIENTE a propósito: "juventudon@ejemplo.com" es una dirección de
+    // ejemplo (ejemplo.com es un dominio reservado) y rebotaría. En cuanto
+    // tengan un correo real, se pone aquí y aparece en la web.
     email: PENDIENTE,
-    whatsapp: PENDIENTE,
-    telefono: PENDIENTE
+    whatsapp: null, // no tienen WhatsApp de contacto
+    telefono: null
   },
 
   redes: {
+    // Canal principal y hoy el único activo: por aquí se les escribe de verdad.
     instagram: { url: "https://www.instagram.com/juventud.on", handle: "@juventud.on", seguidores: "24.7 mil", publicaciones: "1,239" },
     instagramIglesia: { url: "https://www.instagram.com/odresaruba", handle: "@odresaruba" },
-    tiktok: PENDIENTE,
-    youtube: PENDIENTE,
-    facebook: PENDIENTE
+    tiktok: null,
+    youtube: null,
+    facebook: null
   }
 };
 
 /* ---------------------------------------------------------------------------
    2. Devocionales
-   Contenido de EJEMPLO escrito para el prototipo. Debe ser revisado y
-   reemplazado por el contenido oficial del liderazgo de Juventud ON.
+   revisado: true  → contenido oficial entregado por el liderazgo.
+   revisado: false → contenido de ejemplo del prototipo; la web lo avisa debajo
+                     del devocional hasta que el liderazgo lo apruebe o sustituya.
+   El campo `reto` es opcional: si no está, la web no muestra ese bloque.
+   El tiempo de lectura se calcula solo si no se indica `minutos`.
    Citas bíblicas: Reina-Valera 1960.
    ------------------------------------------------------------------------- */
 const DEVOCIONALES = [
+  {
+    titulo: "Dios en nuestra diversión",
+    ref: "Salmos 16:11",
+    versiculo: "Me mostrarás la senda de la vida; en tu presencia hay plenitud de gozo.",
+    revisado: true,
+    reflexion: [
+      "Seguir a Jesús no es aburrido, al contrario, en Él encontramos la verdadera alegría."
+    ]
+  },
+  {
+    titulo: "Amigos que suman",
+    ref: "Proverbios 17:17",
+    versiculo: "En todo tiempo ama el amigo, y es como un hermano en tiempo de angustia.",
+    revisado: true,
+    reflexion: [
+      "Rodéate de personas que te acerquen más a tu propósito."
+    ]
+  },
   {
     titulo: "Nadie tiene en poco tu juventud",
     ref: "1 Timoteo 4:12",
     versiculo:
       "Ninguno tenga en poco tu juventud, sino sé ejemplo de los creyentes en palabra, conducta, amor, espíritu, fe y pureza.",
     minutos: 2,
+    revisado: false,
     reflexion: [
       "Existe una mentira que se repite mucho: que ser joven es sinónimo de “todavía no”. Todavía no estás listo, todavía no tienes experiencia, todavía no te toca.",
       "Pablo le escribe justo lo contrario a Timoteo, que era joven y estaba liderando. No le dice que espere a tener más edad. Le dice que su vida hable tan fuerte que nadie pueda usar su edad como excusa para descartarlo.",
@@ -95,6 +125,7 @@ const DEVOCIONALES = [
     versiculo:
       "Vosotros sois la luz del mundo; una ciudad asentada sobre un monte no se puede esconder.",
     minutos: 2,
+    revisado: false,
     reflexion: [
       "Una luz encendida no tiene que anunciarse. Simplemente se nota. Ese es el punto de estar “ON”: no es un show, es una consecuencia.",
       "Jesús no dijo “deberían ser luz”. Dijo que ya lo son. La pregunta no es si tienes luz, sino qué le pusiste encima esta semana.",
@@ -108,6 +139,7 @@ const DEVOCIONALES = [
     versiculo:
       "Permaneced en mí, y yo en vosotros. Como el pámpano no puede llevar fruto por sí mismo, si no permanece en la vid, así tampoco vosotros, si no permanecéis en mí.",
     minutos: 3,
+    revisado: false,
     reflexion: [
       "Una rama desconectada no muere al instante. Sigue verde un rato, y por eso engaña. El problema aparece semanas después, cuando ya no da nada.",
       "Lo mismo pasa con nosotros. Puedes sostener la apariencia un tiempo sin oración, sin Palabra, sin comunidad. Pero se nota después.",
@@ -121,6 +153,7 @@ const DEVOCIONALES = [
     versiculo:
       "Mira que te mando que te esfuerces y seas valiente; no temas ni desmayes, porque Jehová tu Dios estará contigo en dondequiera que vayas.",
     minutos: 2,
+    revisado: false,
     reflexion: [
       "Dios le dice esto a Josué justo antes de la parte difícil, no después. La valentía no es la ausencia de miedo: es avanzar con el miedo puesto.",
       "Fíjate que la razón no es “porque eres fuerte”. Es “porque Jehová tu Dios estará contigo”. La confianza no está en ti, está en quién va contigo.",
@@ -134,6 +167,7 @@ const DEVOCIONALES = [
     versiculo:
       "Fíate de Jehová de todo tu corazón, y no te apoyes en tu propia prudencia. Reconócelo en todos tus caminos, y él enderezará tus veredas.",
     minutos: 2,
+    revisado: false,
     reflexion: [
       "“No te apoyes en tu propia prudencia” no significa apagar el cerebro. Significa no convertir tu criterio en tu único dios.",
       "Hay decisiones que se ven perfectas en tu cabeza y terminan mal. Y hay caminos que no entiendes hoy y agradeces en dos años.",
@@ -146,6 +180,7 @@ const DEVOCIONALES = [
     ref: "Salmo 119:105",
     versiculo: "Lámpara es a mis pies tu palabra, y lumbrera a mi camino.",
     minutos: 2,
+    revisado: false,
     reflexion: [
       "Una lámpara de mano no ilumina todo el camino. Ilumina el siguiente paso. Y eso es suficiente para no caerte.",
       "Muchas veces le pedimos a Dios el mapa completo y Él nos da luz para hoy. No es que te esconda algo: es que quiere que camines con Él, no sin Él.",
@@ -159,6 +194,7 @@ const DEVOCIONALES = [
     versiculo:
       "Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová, pensamientos de paz, y no de mal, para daros el fin que esperáis.",
     minutos: 3,
+    revisado: false,
     reflexion: [
       "Este versículo se cita mucho en camisetas, pero Dios lo dijo a un pueblo que estaba en el exilio y le quedaban 70 años ahí. O sea: no era una promesa de que todo se arregla mañana.",
       "Y aun así, seguía siendo verdad. Los planes de Dios son buenos incluso cuando el capítulo actual es duro.",
@@ -170,7 +206,10 @@ const DEVOCIONALES = [
 
 /* ---------------------------------------------------------------------------
    3. Anuncios oficiales (líderes y capitanes)
-   Eventos reales observados en @juventud.on. Falta confirmar año/edición.
+   Se quitaron las tarjetas de Campamento, Conferencia Inconformes, FIFA TRNMNT
+   y EVNGLM: eran eventos vistos en Instagram sin fecha confirmada, y el propio
+   liderazgo indica que las nuevas fechas están por definir. Cuando se confirmen,
+   se vuelven a añadir aquí como tarjetas independientes.
    ------------------------------------------------------------------------- */
 const ANUNCIOS = [
   {
@@ -180,54 +219,21 @@ const ANUNCIOS = [
     color: "violeta",
     titulo: "Viernes Juvenil",
     cuando: "Todos los viernes · 7:30pm",
-    lugar: "Iglesia Odres Nuevos, Aruba",
+    lugar: "Iglesia Odres Nuevos — Paradera 4, Aruba",
     texto: "Alabanza en vivo, palabra y comunidad. Trae a un amigo — la entrada es libre.",
     autor: { nombre: "Liderazgo Juventud ON", rol: "Líderes", inicial: "J" },
     cta: { texto: "Marcar asistencia", accion: "ir-racha" }
   },
   {
-    id: "campamento",
-    etiqueta: "Campamento",
+    id: "proximamente",
+    etiqueta: "Próximamente",
     color: "fuego",
-    titulo: "Campamento Juvenil",
-    cuando: "17 al 19 de julio",
-    lugar: PENDIENTE,
-    texto: "Tres días fuera de la rutina: dinámicas, adoración y noches que no se olvidan. Inscripciones abiertas hasta llenar cupo.",
-    autor: { nombre: PENDIENTE, rol: "Líder", inicial: "?" },
-    cta: { texto: "Quiero inscribirme", accion: "contacto" }
-  },
-  {
-    id: "inconformes",
-    etiqueta: "Conferencia",
-    color: "magenta",
-    titulo: "Conferencia Inconformes",
-    cuando: PENDIENTE,
+    titulo: "¡Nuevas actividades muy pronto!",
+    cuando: "Fechas por confirmar",
     lugar: "Iglesia Odres Nuevos, Aruba",
-    texto: "Con invitada especial Paola Nicole (Puerto Rico). Una conferencia para los que no se conforman con una fe tibia.",
-    autor: { nombre: PENDIENTE, rol: "Líder", inicial: "?" },
-    cta: { texto: "Ver detalles", accion: "contacto" }
-  },
-  {
-    id: "fifa",
-    etiqueta: "Recreativo",
-    color: "cian",
-    titulo: "FIFA TRNMNT",
-    cuando: "18 de noviembre",
-    lugar: "Iglesia Odres Nuevos, Aruba",
-    texto: "Torneo de FIFA abierto. Arma tu equipo, trae tu control y demuestra que puedes. Habrá premio.",
-    autor: { nombre: PENDIENTE, rol: "Capitán", inicial: "?" },
-    cta: { texto: "Anotarme", accion: "contacto" }
-  },
-  {
-    id: "evnglm",
-    etiqueta: "Evangelismo",
-    color: "ambar",
-    titulo: "EVNGLM — Salida de evangelismo",
-    cuando: PENDIENTE,
-    lugar: PENDIENTE,
-    texto: "Salimos a la calle a compartir el mensaje. No necesitas experiencia, solo ganas.",
-    autor: { nombre: PENDIENTE, rol: "Líder", inicial: "?" },
-    cta: { texto: "Sumarme", accion: "contacto" }
+    texto: "Estamos preparando grandes sorpresas, campamentos y torneos para este año. ¡Manténganse atentos a la aplicación para futuras actualizaciones!",
+    autor: { nombre: "Eider y Nancy Mendoza", rol: "Líderes de Juventud ON", inicial: "E" },
+    cta: { texto: "Seguirnos en Instagram", accion: "instagram" }
   }
 ];
 
@@ -282,21 +288,16 @@ const LOGROS = [
    Panel del prototipo (botón flotante). Al abrirlo se resaltan en la página
    los bloques que todavía muestran un placeholder.
    Para producción: borrar este array y el panel #panel-pendientes del HTML.
+
+   Ya resueltos por el liderazgo: dirección, misión, visión, valores, rango de
+   edad, nombres de líderes. Confirmados como inexistentes (no son pendientes):
+   lema, WhatsApp, TikTok, YouTube, Facebook y actividad entre semana.
    ------------------------------------------------------------------------- */
 const PENDIENTES = [
-  { campo: "Dirección exacta en Aruba", donde: "Info y contacto", archivo: "data.js → CONFIG.ubicacion.direccion" },
-  { campo: "Correo de contacto", donde: "Info y contacto", archivo: "data.js → CONFIG.contacto.email" },
-  { campo: "WhatsApp / teléfono", donde: "Info y contacto", archivo: "data.js → CONFIG.contacto.whatsapp" },
-  { campo: "TikTok, YouTube y Facebook", donde: "Info y contacto", archivo: "data.js → CONFIG.redes" },
-  { campo: "Misión y visión oficiales", donde: "Inicio", archivo: "data.js → CONFIG.mision / CONFIG.vision (hoy hay un borrador sugerido)" },
-  { campo: "Valores oficiales del ministerio", donde: "Inicio", archivo: "data.js → CONFIG.valores (hoy hay una propuesta)" },
-  { campo: "Rango de edad del ministerio", donde: "Inicio", archivo: "data.js → CONFIG.edades" },
-  { campo: "Lema o versículo del ministerio", donde: "Inicio", archivo: "data.js → CONFIG.lema" },
-  { campo: "Nombres de líderes y capitanes", donde: "Anuncios", archivo: "data.js → ANUNCIOS[].autor.nombre" },
-  { campo: "Año / edición de campamento, conferencia y torneo", donde: "Anuncios", archivo: "data.js → ANUNCIOS[].cuando" },
-  { campo: "Actividad de los jueves (nombre y horario)", donde: "Info y contacto", archivo: "data.js → añadir a CONFIG.servicio" },
-  { campo: "Logo en alta resolución (PNG/SVG)", donde: "Toda la web", archivo: "assets/ (hoy el logo es un emblema hecho en SVG)" },
+  { campo: "Correo de contacto real", donde: "Info y contacto", archivo: "data.js → CONFIG.contacto.email (hoy solo se ofrece el Instagram, que sí funciona)" },
+  { campo: "Logo en alta resolución (PNG/SVG)", donde: "Toda la web", archivo: "assets/ (hoy el emblema es una reconstrucción en SVG)" },
   { campo: "Fotos reales + permiso de imagen de los jóvenes", donde: "Feed", archivo: "data.js → FEED (hoy son degradados de ejemplo)" },
-  { campo: "Revisión pastoral del contenido devocional", donde: "Racha", archivo: "data.js → DEVOCIONALES (contenido de ejemplo)" },
-  { campo: "Aviso de privacidad para menores de edad", donde: "Feed / registro", archivo: "index.html → pie de página" }
+  { campo: "Revisión pastoral de los 7 devocionales de ejemplo", donde: "Racha", archivo: "data.js → DEVOCIONALES con revisado: false" },
+  { campo: "Aviso de privacidad para menores de edad", donde: "Pie de página", archivo: "index.html → pie de página" },
+  { campo: "Fechas de campamento, conferencia y torneo, cuando se confirmen", donde: "Anuncios", archivo: "data.js → ANUNCIOS (añadir una tarjeta por evento)" }
 ];
