@@ -1,7 +1,7 @@
 /* ============================================================================
    Juventud ON — lógica del prototipo
    ----------------------------------------------------------------------------
-   Todo el estado (rachas, likes, comentarios, puntos) se guarda en
+   Todo el estado (rachas, retos, puntos) se guarda en
    localStorage, o sea SOLO en el dispositivo de cada persona. Para que sea
    compartido y real hace falta backend + cuentas (ver README, siguientes pasos).
    ========================================================================== */
@@ -75,9 +75,6 @@
     puntos: 0,
     equipo: EQUIPOS[0].id,
     retos: [],          // ids de retos completados
-    likes: {},          // { idPost: true }
-    comentarios: {},    // { idPost: [{autor, texto}] }
-    publicaciones: [],  // posts creados desde el prototipo
     demo: false
   });
 
@@ -99,7 +96,7 @@
 
   /* ---------------------------------------------------------------- navegación */
 
-  const VISTAS = ["inicio", "racha", "feed", "anuncios", "retos"];
+  const VISTAS = ["inicio", "racha", "anuncios", "retos"];
 
   function ir(vista) {
     if (!VISTAS.includes(vista)) vista = "inicio";
@@ -264,6 +261,10 @@
     $("#dev-versiculo").textContent = `“${d.versiculo}”`;
     $("#dev-ref").textContent = d.ref + " (RVR1960)";
     $("#dev-reflexion").innerHTML = d.reflexion.map((p) => `<p>${esc(p)}</p>`).join("");
+    // Crédito de la fuente, cuando el devocional viene de otro autor o libro
+    $("#dev-fuente").classList.toggle("hidden", !d.fuente);
+    if (d.fuente) $("#dev-fuente").textContent = d.fuente;
+
     // El reto es opcional: el contenido oficial del liderazgo no lo trae
     $("#dev-reto-bloque").classList.toggle("hidden", !d.reto);
     if (d.reto) $("#dev-reto").textContent = d.reto;
@@ -380,128 +381,6 @@
         </p>
       </article>`;
     }).join("");
-  }
-
-  /* ---------------------------------------------------------------- feed */
-
-  const PH = ["ph-1", "ph-2", "ph-3", "ph-4", "ph-5", "ph-6", "ph-7", "ph-8"];
-
-  const todasLasPublicaciones = () => estado.publicaciones.concat(FEED);
-
-  function likesDe(p) {
-    return p.likes + (estado.likes[p.id] ? 1 : 0);
-  }
-  function comentariosDe(p) {
-    return (p.comentarios || []).concat(estado.comentarios[p.id] || []);
-  }
-
-  function pintarFeed() {
-    $("#grid-feed").innerHTML = todasLasPublicaciones().map((p) => `
-      <article class="group relative overflow-hidden rounded-2xl border border-white/10">
-        <button class="block w-full" data-abrir="${p.id}" aria-label="Ver publicación de ${esc(p.autor)}">
-          <span class="ph ${p.ph} block aspect-square w-full"></span>
-        </button>
-        <div class="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent p-3">
-          <p class="truncate text-xs font-semibold text-white">${esc(p.autor)}</p>
-          <p class="truncate text-[0.7rem] text-white/60">${esc(p.pilar)}</p>
-        </div>
-        <button data-like="${p.id}"
-          class="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-1.5 text-xs font-bold backdrop-blur-sm ${estado.likes[p.id] ? "text-magenta-400" : "text-white/80"}"
-          aria-pressed="${!!estado.likes[p.id]}" aria-label="Me gusta">
-          <span aria-hidden="true">${estado.likes[p.id] ? "❤️" : "🤍"}</span>${likesDe(p)}
-        </button>
-      </article>`).join("");
-  }
-
-  function alternarLike(id) {
-    estado.likes[id] = !estado.likes[id];
-    guardar();
-    pintarFeed();
-    if ($("#modal").dataset.post === String(id)) abrirModal(id, true);
-  }
-
-  /* --- modal de publicación --- */
-  let ultimoFoco = null;
-
-  function abrirModal(id, soloRefrescar) {
-    const p = todasLasPublicaciones().find((x) => String(x.id) === String(id));
-    if (!p) return;
-    const m = $("#modal");
-    m.dataset.post = p.id;
-    $("#modal-foto").className = `ph ${p.ph} aspect-square w-full`;
-    $("#modal-avatar").textContent = p.inicial;
-    $("#modal-titulo").textContent = p.autor;
-    $("#modal-pilar").textContent = p.pilar;
-    $("#modal-texto").textContent = p.texto;
-    $("#modal-likes").textContent = likesDe(p);
-    $("#modal-like").firstElementChild.textContent = estado.likes[p.id] ? "❤️" : "🤍";
-    $("#modal-like").classList.toggle("text-magenta-400", !!estado.likes[p.id]);
-
-    const cs = comentariosDe(p);
-    $("#modal-comentarios").innerHTML = cs.length
-      ? cs.map((c) => `<p class="text-sm"><strong class="text-white">${esc(c.autor)}</strong>
-          <span class="text-white/65">${esc(c.texto)}</span></p>`).join("")
-      : '<p class="text-sm text-white/35">Todavía no hay comentarios. Sé el primero.</p>';
-
-    if (soloRefrescar) return;
-    ultimoFoco = document.activeElement;
-    m.classList.remove("hidden");
-    m.classList.add("flex");
-    document.body.style.overflow = "hidden";
-    $("#modal-cerrar").focus();
-  }
-
-  function cerrarModal() {
-    const m = $("#modal");
-    m.classList.add("hidden");
-    m.classList.remove("flex");
-    document.body.style.overflow = "";
-    if (ultimoFoco) ultimoFoco.focus();
-  }
-
-  /* --- publicar una foto (simulado) --- */
-  function alternarComponer() {
-    let form = $("#form-publicar");
-    if (form) { form.remove(); return; }
-    form = document.createElement("form");
-    form.id = "form-publicar";
-    form.className = "tarjeta mb-5 space-y-3 p-5 aparece";
-    form.innerHTML = `
-      <p class="text-sm font-semibold text-white">Comparte un momento</p>
-      <div class="ph ph-${Math.ceil(Math.random() * 8)} grid aspect-video place-items-center rounded-xl">
-        <span class="relative z-10 rounded-full bg-black/50 px-3 py-1.5 text-xs text-white/80">Foto de ejemplo generada</span>
-      </div>
-      <label for="txt-publicar" class="sr-only">Escribe un pie de foto</label>
-      <input id="txt-publicar" type="text" maxlength="120" required placeholder="¿Qué está pasando?"
-             class="w-full rounded-xl border border-white/10 bg-noche-800 px-4 py-2.5 text-white placeholder:text-white/30">
-      <div class="flex gap-2">
-        <button class="btn-magenta">Publicar</button>
-        <button type="button" id="cancelar-publicar" class="btn-secundario">Cancelar</button>
-      </div>
-      <p class="text-xs text-white/35">En el prototipo la foto es un degradado de ejemplo y la publicación solo se guarda en tu dispositivo.</p>`;
-    $("#grid-feed").before(form);
-    $("#txt-publicar").focus();
-
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const texto = $("#txt-publicar").value.trim();
-      if (!texto) return;
-      estado.publicaciones.unshift({
-        id: "p" + Date.now(),
-        ph: PH[Math.floor(Math.random() * PH.length)],
-        autor: "Tú",
-        inicial: "T",
-        pilar: "Comunidad",
-        texto,
-        likes: 0,
-        comentarios: []
-      });
-      guardar();
-      form.remove();
-      pintarFeed();
-      toast("📸 Publicado en tu feed");
-    });
-    $("#cancelar-publicar").addEventListener("click", () => form.remove());
   }
 
   /* ---------------------------------------------------------------- anuncios */
@@ -657,12 +536,6 @@
       const nav = e.target.closest("[data-ir]");
       if (nav) { e.preventDefault(); ir(nav.dataset.ir); return; }
 
-      const like = e.target.closest("[data-like]");
-      if (like) { alternarLike(like.dataset.like); return; }
-
-      const abrir = e.target.closest("[data-abrir]");
-      if (abrir) { abrirModal(abrir.dataset.abrir); return; }
-
       const reto = e.target.closest("[data-reto]");
       if (reto) { completarReto(reto.dataset.reto); return; }
 
@@ -679,35 +552,12 @@
         }
         return;
       }
-
-      if (e.target.closest("#modal") === null && !e.target.closest("[data-abrir]")) {
-        // clic fuera del contenido del modal
-        const m = $("#modal");
-        if (!m.classList.contains("hidden") && e.target === m) cerrarModal();
-      }
     });
 
     $("#btn-devocional").addEventListener("click", marcarDevocional);
     $("#btn-asistencia").addEventListener("click", marcarAsistencia);
-    $("#modal-cerrar").addEventListener("click", cerrarModal);
-    $("#modal").addEventListener("click", (e) => { if (e.target === $("#modal")) cerrarModal(); });
-    $("#modal-like").addEventListener("click", () => alternarLike($("#modal").dataset.post));
-    $("#btn-componer").addEventListener("click", alternarComponer);
     $("#btn-pendientes").addEventListener("click", () => alternarPanelPendientes());
     $("#cerrar-pendientes").addEventListener("click", () => alternarPanelPendientes(false));
-
-    $("#form-comentario").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const campo = $("#input-comentario");
-      const texto = campo.value.trim();
-      if (!texto) return;
-      const id = $("#modal").dataset.post;
-      (estado.comentarios[id] = estado.comentarios[id] || []).push({ autor: "Tú", texto });
-      campo.value = "";
-      guardar();
-      abrirModal(id, true);
-      pintarFeed();
-    });
 
     $("#sel-equipo").addEventListener("change", (e) => {
       estado.equipo = e.target.value;
@@ -723,7 +573,7 @@
     });
 
     $("#btn-reset").addEventListener("click", () => {
-      if (!confirm("¿Borrar tu racha, puntos, likes y publicaciones de este dispositivo?")) return;
+      if (!confirm("¿Borrar tu racha y tus puntos de este dispositivo?")) return;
       estado = estadoInicial();
       guardar();
       pintarTodo();
@@ -731,9 +581,9 @@
     });
 
     document.addEventListener("keydown", (e) => {
-      if (e.key !== "Escape") return;
-      if (!$("#modal").classList.contains("hidden")) cerrarModal();
-      else if (!$("#panel-pendientes").classList.contains("hidden")) alternarPanelPendientes(false);
+      if (e.key === "Escape" && !$("#panel-pendientes").classList.contains("hidden")) {
+        alternarPanelPendientes(false);
+      }
     });
 
     window.addEventListener("hashchange", () => ir(location.hash.slice(1)));
@@ -747,7 +597,6 @@
     pintarDevocional();
     pintarAsistencia();
     pintarLogros();
-    pintarFeed();
     pintarAnuncios();
     pintarEquipos();
     pintarRetos();

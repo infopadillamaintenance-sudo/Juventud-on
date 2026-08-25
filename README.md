@@ -3,7 +3,7 @@
 Landing page / aplicación web para **Juventud ON**, el ministerio juvenil de la iglesia
 **Odres Nuevos** (Aruba). Está pensada como una app juvenil y gamificada —no como un sitio
 institucional de iglesia— con devocional diario tipo racha, racha de asistencia a los
-viernes, feed social, anuncios oficiales y retos en equipo.
+viernes, anuncios oficiales y retos en equipo.
 
 > **Servicio:** todos los viernes a las 7:30pm · Iglesia Odres Nuevos, Paradera 4, Aruba
 > **Edades:** 13 a 25 años
@@ -41,6 +41,7 @@ assets/
 src/input.css                 Fuente del CSS (paleta, componentes, animaciones)
 tools/build-single-file.mjs   Genera dist/juventud-on.html
 dist/juventud-on.html         Versión de un solo archivo, lista para enviar
+docs/                         Plantillas para el ministerio (permiso de imagen, devocionales)
 contexto/                     Los documentos de contexto del ministerio
 ```
 
@@ -56,7 +57,6 @@ Casi todo se edita en **`assets/js/data.js`**, sin tocar el HTML:
 | Misión, visión, valores | `CONFIG.mision`, `CONFIG.vision`, `CONFIG.valores` |
 | Devocionales | `DEVOCIONALES` |
 | Anuncios de líderes y capitanes | `ANUNCIOS` |
-| Publicaciones del feed | `FEED` |
 | Equipos y retos | `EQUIPOS`, `RETOS` |
 | Insignias | `LOGROS` |
 
@@ -92,15 +92,14 @@ aparece un marcador `[COMPLETAR]` en color ámbar.
 Para verlos todos: pulsa el botón **⚠ Por completar** (abajo a la derecha). Se abre un panel
 con la lista y, mientras está abierto, se resaltan en la página los bloques afectados.
 
-Quedan **5 pendientes**:
+Quedan **3 pendientes**:
 
 1. **Logo en alta resolución** (PNG o SVG). El emblema actual es una reconstrucción hecha a
    partir de la captura de Instagram: sirve para el prototipo, no como archivo final.
-2. **Fotos reales y permiso de imagen** de los jóvenes que aparezcan.
-3. **Revisión pastoral de los 7 devocionales de ejemplo** (`revisado: false` en `data.js`).
-   Los dos del liderazgo ya están marcados como revisados y la web los muestra sin aviso.
-4. **Aviso de privacidad** para menores de edad, en el pie de página.
-5. **Fechas de campamento, conferencia y torneo**, cuando se confirmen. Hoy hay un único
+2. **Contenido definitivo de los devocionales.** Los 7 de ejemplo (`revisado: false` en
+   `data.js`) llevan un aviso hasta que se aprueben o se sustituyan. Los dos del liderazgo
+   ya salen sin aviso. Formato para enviar los nuevos: `docs/plantilla-devocionales.md`.
+3. **Fechas de campamento, conferencia y torneo**, cuando se confirmen. Hoy hay un único
    anuncio de "Nuevas actividades muy pronto"; cada evento confirmado se añade como una
    tarjeta propia en `ANUNCIOS`.
 
@@ -123,8 +122,10 @@ y el panel `#panel-pendientes`, y de `data.js` el array `PENDIENTES`.
   se genera una versión de un solo archivo para compartir.
 - **Modo oscuro fijo.** Es la identidad de la marca (ver `contexto/04-guia-estilo-visual.md`
   y el feed real de Instagram), no una preferencia del dispositivo.
-- **Las fotos del feed son degradados CSS**, no imágenes reales, precisamente porque falta
-  resolver el permiso de imagen.
+- **Sin feed de fotos.** Se descartó a propósito: publicar fotos de jóvenes (varios menores
+  de edad) obliga a gestionar permisos de imagen uno por uno, y el ministerio prefiere que
+  ese contenido siga viviendo en Instagram. La web no publica fotos ni recoge datos
+  personales de nadie.
 - **Rachas con lógica real de fechas**: el devocional se rompe si te saltas un día, y la
   asistencia se cuenta por viernes consecutivos, no por días. El botón de asistencia solo
   se activa los viernes (hay un *modo demo* para probarlo cualquier día).
@@ -133,16 +134,15 @@ y el panel `#panel-pendientes`, y de `data.js` el array `PENDIENTES`.
 
 Esto es un prototipo de frontend. **Todo el progreso se guarda solo en el dispositivo de
 cada persona** (`localStorage`): si alguien entra desde otro teléfono, empieza de cero, y
-los likes o publicaciones no los ve nadie más.
+los puntos de equipo que se ven en la tabla son de ejemplo, no un marcador real compartido.
 
 Para que funcione de verdad como comunidad hace falta:
 
 1. **Cuentas de usuario**, para que la racha y los puntos sean de la persona y no del navegador.
-2. **Backend y base de datos** para rachas, feed, comentarios, anuncios y puntajes compartidos.
+2. **Backend y base de datos** para rachas, anuncios y puntajes compartidos.
 3. **Panel de líderes** para publicar anuncios sin tocar código.
-4. **Moderación del feed** — imprescindible habiendo menores de edad.
-5. **Notificaciones** (push o WhatsApp) para recordar el devocional y no romper la racha.
-6. **Recompensas** conectadas al marcador de puntos.
+4. **Notificaciones** (push o correo) para recordar el devocional y no romper la racha.
+5. **Recompensas** conectadas al marcador de puntos.
 
 ---
 

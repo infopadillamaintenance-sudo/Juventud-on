@@ -80,6 +80,8 @@ const CONFIG = {
    revisado: false → contenido de ejemplo del prototipo; la web lo avisa debajo
                      del devocional hasta que el liderazgo lo apruebe o sustituya.
    El campo `reto` es opcional: si no está, la web no muestra ese bloque.
+   El campo `fuente` también es opcional: si se indica, la web muestra el crédito
+   debajo del devocional (para material inspirado en libros u otros autores).
    El tiempo de lectura se calcula solo si no se indica `minutos`.
    Citas bíblicas: Reina-Valera 1960.
    ------------------------------------------------------------------------- */
@@ -235,26 +237,7 @@ const ANUNCIOS = [
 ];
 
 /* ---------------------------------------------------------------------------
-   4. Feed social — CONTENIDO DE EJEMPLO
-   Las "fotos" son degradados CSS, no imágenes reales, y los usuarios son
-   ficticios. Está pendiente confirmar derechos de imagen de los jóvenes antes
-   de publicar fotos reales (ver contexto/06-referencias-visuales-instagram.md).
-   ------------------------------------------------------------------------- */
-const FEED = [
-  { id: 1, ph: "ph-1", autor: "Ejemplo 01", inicial: "A", pilar: "Viernes Juvenil", texto: "Anoche estuvo encendido 🔥 gracias a todos los que vinieron", likes: 128, comentarios: [
-      { autor: "Ejemplo 04", texto: "Se sintió diferente ayer 🙌" },
-      { autor: "Ejemplo 07", texto: "El que faltó, se lo perdió" } ] },
-  { id: 2, ph: "ph-2", autor: "Ejemplo 02", inicial: "B", pilar: "Banda", texto: "Ensayo de banda antes del servicio", likes: 86, comentarios: [ { autor: "Ejemplo 03", texto: "Suenan brutal" } ] },
-  { id: 3, ph: "ph-3", autor: "Ejemplo 03", inicial: "C", pilar: "Campamento", texto: "Recap del campamento — todavía no lo superamos", likes: 231, comentarios: [ { autor: "Ejemplo 05", texto: "El mejor de todos" }, { autor: "Ejemplo 01", texto: "¿Cuándo el próximo?" } ] },
-  { id: 4, ph: "ph-4", autor: "Ejemplo 04", inicial: "D", pilar: "Conferencia", texto: "Inconformes. Nada volvió a ser igual después de esa noche", likes: 174, comentarios: [] },
-  { id: 5, ph: "ph-5", autor: "Ejemplo 05", inicial: "E", pilar: "Comunidad", texto: "Después del servicio siempre hay plan 😎", likes: 64, comentarios: [ { autor: "Ejemplo 02", texto: "La próxima me avisan" } ] },
-  { id: 6, ph: "ph-6", autor: "Ejemplo 06", inicial: "F", pilar: "Viernes Juvenil", texto: "Manos arriba, sin pena", likes: 142, comentarios: [] },
-  { id: 7, ph: "ph-7", autor: "Ejemplo 07", inicial: "G", pilar: "Vlog", texto: "Vlog nuevo arriba — link en el Insta", likes: 97, comentarios: [ { autor: "Ejemplo 06", texto: "Ya lo vi 3 veces" } ] },
-  { id: 8, ph: "ph-8", autor: "Ejemplo 08", inicial: "H", pilar: "Evangelismo", texto: "Salimos a la calle y pasaron cosas buenas", likes: 118, comentarios: [] }
-];
-
-/* ---------------------------------------------------------------------------
-   5. Gamificación: equipos y retos
+   4. Gamificación: equipos y retos
    ------------------------------------------------------------------------- */
 const EQUIPOS = [
   { id: "encendidos", nombre: "Encendidos", emoji: "🔥", color: "fuego", puntos: 1840, miembros: 24 },
@@ -267,7 +250,7 @@ const RETOS = [
   { id: "r1", titulo: "Invita a un amigo el viernes", detalle: "Trae a alguien que nunca ha venido a Juventud ON.", puntos: 50, tipo: "Semanal", icono: "🤝" },
   { id: "r2", titulo: "7 días de devocional seguidos", detalle: "Completa una semana entera sin romper la racha.", puntos: 100, tipo: "Semanal", icono: "🔥" },
   { id: "r3", titulo: "Sirve en un área este viernes", detalle: "Alabanza, producción, bienvenida, limpieza… donde haga falta.", puntos: 75, tipo: "Semanal", icono: "🙌" },
-  { id: "r4", titulo: "Sube una foto con #JuventudON", detalle: "Comparte un momento real del servicio o del grupo.", puntos: 30, tipo: "Mensual", icono: "📸" },
+  { id: "r4", titulo: "Etiquétanos en tu historia", detalle: "Sube una foto del viernes a tu Instagram y etiqueta a @juventud.on.", puntos: 30, tipo: "Mensual", icono: "📸" },
   { id: "r5", titulo: "Memoriza el versículo del mes", detalle: "Recítalo a tu capitán para validar el reto.", puntos: 60, tipo: "Mensual", icono: "📖" },
   { id: "r6", titulo: "Escribe a alguien que se alejó", detalle: "Un mensaje sincero a quien hace rato no viene.", puntos: 80, tipo: "Mensual", icono: "💬" }
 ];
@@ -281,19 +264,19 @@ const LOGROS = [
 ];
 
 /* ---------------------------------------------------------------------------
-   6. Checklist de datos por completar
+   5. Checklist de datos por completar
    Panel del prototipo (botón flotante). Al abrirlo se resaltan en la página
    los bloques que todavía muestran un placeholder.
    Para producción: borrar este array y el panel #panel-pendientes del HTML.
 
    Ya resueltos por el liderazgo: dirección, correo, misión, visión, valores,
-   rango de edad, nombres de líderes. Confirmados como inexistentes (no son pendientes):
+   rango de edad, nombres de líderes. El feed social se retiró del proyecto, así
+   que los permisos de imagen y el aviso de privacidad dejan de ser necesarios
+   para esta web (siguen siendo relevantes para lo que se publique en Instagram). Confirmados como inexistentes (no son pendientes):
    lema, WhatsApp, TikTok, YouTube, Facebook y actividad entre semana.
    ------------------------------------------------------------------------- */
 const PENDIENTES = [
   { campo: "Logo en alta resolución (PNG/SVG)", donde: "Toda la web", archivo: "assets/ (hoy el emblema es una reconstrucción en SVG)" },
-  { campo: "Fotos reales + permiso de imagen de los jóvenes", donde: "Feed", archivo: "data.js → FEED (hoy son degradados de ejemplo)" },
   { campo: "Revisión pastoral de los 7 devocionales de ejemplo", donde: "Racha", archivo: "data.js → DEVOCIONALES con revisado: false" },
-  { campo: "Aviso de privacidad para menores de edad", donde: "Pie de página", archivo: "index.html → pie de página" },
   { campo: "Fechas de campamento, conferencia y torneo, cuando se confirmen", donde: "Anuncios", archivo: "data.js → ANUNCIOS (añadir una tarjeta por evento)" }
 ];

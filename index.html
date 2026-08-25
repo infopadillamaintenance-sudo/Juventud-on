@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Juventud ON — Odres Nuevos</title>
-<meta name="description" content="Juventud ON, el ministerio juvenil de la iglesia Odres Nuevos en Aruba. Todos los viernes a las 7:30pm. Devocional diario, racha de asistencia, feed de la comunidad y retos en equipo.">
+<meta name="description" content="Juventud ON, el ministerio juvenil de la iglesia Odres Nuevos en Aruba. Todos los viernes a las 7:30pm. Devocional diario, racha de asistencia, anuncios del liderazgo y retos en equipo.">
 <meta name="theme-color" content="#06060a">
 <meta property="og:title" content="Juventud ON — Odres Nuevos">
 <meta property="og:description" content="Todos los viernes a las 7:30pm. Enciende tu racha, únete a la comunidad.">
@@ -48,7 +48,6 @@
     <nav class="ml-auto hidden items-center gap-1 md:flex" aria-label="Secciones">
       <button data-ir="inicio"   class="nav-desktop">Inicio</button>
       <button data-ir="racha"    class="nav-desktop">Racha</button>
-      <button data-ir="feed"     class="nav-desktop">Feed</button>
       <button data-ir="anuncios" class="nav-desktop">Anuncios</button>
       <button data-ir="retos"    class="nav-desktop">Retos</button>
     </nav>
@@ -142,10 +141,10 @@
         <span><span class="titulo-feature">Racha de viernes</span>
         <span class="texto-feature">Cada viernes que vienes suma. A ver hasta dónde llegas.</span></span>
       </button>
-      <button data-ir="feed" class="tarjeta-feature group">
-        <span class="icono-feature bg-magenta-500/15 text-magenta-400">📸</span>
-        <span><span class="titulo-feature">Feed de la comunidad</span>
-        <span class="texto-feature">Las fotos de los servicios, campamentos y todo lo que pasa.</span></span>
+      <button data-ir="anuncios" class="tarjeta-feature group">
+        <span class="icono-feature bg-magenta-500/15 text-magenta-400">📣</span>
+        <span><span class="titulo-feature">Anuncios</span>
+        <span class="texto-feature">Campamentos, torneos y todo lo que viene, de primera mano.</span></span>
       </button>
       <button data-ir="retos" class="tarjeta-feature group">
         <span class="icono-feature bg-violeta-500/15 text-violeta-400">🎮</span>
@@ -226,6 +225,7 @@
           <cite id="dev-ref" class="mt-2 block text-sm not-italic font-semibold text-fuego-400"></cite>
         </blockquote>
         <div id="dev-reflexion" class="space-y-3 text-white/70"></div>
+        <p id="dev-fuente" class="mt-4 border-l-2 border-white/15 pl-3 text-xs italic text-white/45"></p>
         <p id="dev-reto-bloque" class="mt-5 rounded-xl border border-violeta-500/30 bg-violeta-500/10 p-4 text-sm">
           <strong class="text-violeta-400">Reto de hoy · </strong><span id="dev-reto" class="text-white/80"></span>
         </p>
@@ -275,24 +275,10 @@
     <button id="btn-reset" class="mt-6 text-sm text-white/35 underline underline-offset-4 hover:text-rojo-500">Reiniciar mi progreso</button>
   </section>
 
-  <!-- ══════════════════════════ FEED ══════════════════════════ -->
-  <section id="vista-feed" class="vista hidden" aria-labelledby="t-feed">
-    <h2 id="t-feed" class="titulo-seccion !mt-8">El feed</h2>
-    <p class="-mt-4 mb-5 text-white/55">Lo que pasa en Juventud ON, contado por ustedes.</p>
-
-    <p class="mb-5 rounded-xl border border-ambar-500/30 bg-ambar-500/10 p-3 text-sm text-ambar-400" data-pendiente>
-      <strong>Contenido de ejemplo.</strong> Las fotos y los usuarios son de demostración. Antes de publicar fotos reales hay que confirmar el permiso de imagen de los jóvenes (varios son menores de edad).
-    </p>
-
-    <button id="btn-componer" class="btn-magenta mb-5 w-full justify-center sm:w-auto">📸 Compartir una foto</button>
-
-    <div id="grid-feed" class="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3"></div>
-  </section>
-
   <!-- ══════════════════════════ ANUNCIOS ══════════════════════════ -->
   <section id="vista-anuncios" class="vista hidden" aria-labelledby="t-anuncios">
     <h2 id="t-anuncios" class="titulo-seccion !mt-8">Anuncios oficiales</h2>
-    <p class="-mt-4 mb-5 text-white/55">Publicado por los líderes y capitanes de Juventud ON. Esto no es el feed: aquí va lo importante.</p>
+    <p class="-mt-4 mb-5 text-white/55">Todo lo que necesitas saber, publicado por los líderes y capitanes de Juventud ON.</p>
     <div id="lista-anuncios" class="space-y-4"></div>
     <div class="mt-6 rounded-2xl border border-dashed border-white/15 p-5 text-center text-sm text-white/45">
       <strong class="block text-white/70">Solo líderes y capitanes publican aquí.</strong>
@@ -342,8 +328,7 @@
     <svg class="h-8 w-8" aria-hidden="true"><use href="#emblema"/></svg>
     <p><strong class="text-white/70">Juventud ON</strong> — Ministerio juvenil de Odres Nuevos, Aruba.</p>
   </div>
-  <p class="mt-4" data-pendiente>Aviso de privacidad y consentimiento de imagen para menores de edad: <strong class="text-ambar-500">[COMPLETAR]</strong></p>
-  <p class="mt-2">Prototipo — los datos de racha, likes y puntos se guardan solo en este dispositivo.</p>
+  <p class="mt-4">Esta web no publica fotos ni recoge datos personales de nadie. Tu racha y tus puntos se guardan únicamente en este dispositivo.</p>
 </footer>
 
 <!-- ══════════════════════════ NAV MÓVIL ══════════════════════════ -->
@@ -351,35 +336,10 @@
   <div class="mx-auto flex max-w-lg">
     <button data-ir="inicio"   class="nav-movil"><span aria-hidden="true">🏠</span>Inicio</button>
     <button data-ir="racha"    class="nav-movil"><span aria-hidden="true">🔥</span>Racha</button>
-    <button data-ir="feed"     class="nav-movil"><span aria-hidden="true">📸</span>Feed</button>
     <button data-ir="anuncios" class="nav-movil"><span aria-hidden="true">📣</span>Anuncios</button>
     <button data-ir="retos"    class="nav-movil"><span aria-hidden="true">🎮</span>Retos</button>
   </div>
 </nav>
-
-<!-- ══════════════════════════ MODAL DE FOTO ══════════════════════════ -->
-<div id="modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
-  <div class="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-white/10 bg-noche-900 sin-scrollbar">
-    <div id="modal-foto" class="ph aspect-square w-full"></div>
-    <div class="p-5">
-      <div class="flex items-center gap-3">
-        <span id="modal-avatar" class="avatar"></span>
-        <div><p id="modal-titulo" class="font-semibold text-white"></p><p id="modal-pilar" class="text-xs text-white/45"></p></div>
-        <button id="modal-cerrar" class="ml-auto rounded-full border border-white/10 px-3 py-1.5 text-sm text-white/60 hover:bg-white/10" aria-label="Cerrar">✕</button>
-      </div>
-      <p id="modal-texto" class="mt-4 text-white/80"></p>
-      <div class="mt-4 flex items-center gap-4 border-y border-white/5 py-3">
-        <button id="modal-like" class="flex items-center gap-2 text-white/70 hover:text-magenta-400"><span class="text-xl">🤍</span><span id="modal-likes">0</span></button>
-      </div>
-      <div id="modal-comentarios" class="mt-3 space-y-3"></div>
-      <form id="form-comentario" class="mt-4 flex gap-2">
-        <label for="input-comentario" class="sr-only">Escribe un comentario</label>
-        <input id="input-comentario" type="text" placeholder="Escribe un comentario…" maxlength="140" class="flex-1 rounded-xl border border-white/10 bg-noche-800 px-4 py-2.5 text-white placeholder:text-white/30">
-        <button class="btn-magenta shrink-0 px-4">Enviar</button>
-      </form>
-    </div>
-  </div>
-</div>
 
 <!-- ══════════════════════════ PANEL DE PENDIENTES (solo prototipo) ══════════════════════════ -->
 <button id="btn-pendientes" title="Datos por completar"
