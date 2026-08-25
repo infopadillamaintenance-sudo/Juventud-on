@@ -1,0 +1,8 @@
+node_modules/
+.DS_Store
+*.log
+
+# Las capturas de Instagram del paquete de contexto no se suben al repositorio:
+# contienen fotos de jóvenes (varios menores de edad) y falta confirmar el
+# permiso de imagen. Se conservan fuera del repositorio.
+contexto/imagenes-referencia-instagram/
