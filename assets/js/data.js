@@ -237,7 +237,88 @@ const ANUNCIOS = [
 ];
 
 /* ---------------------------------------------------------------------------
-   4. Gamificación: equipos y retos
+   4. Servir: requisito y ministerios
+   OJO con el vocabulario: aquí "ministerios" son las áreas de servicio reales
+   (V.I.P., Multimedia, Banda, Ujier). Los "equipos" del apartado 5 son otra
+   cosa: los equipos de competición de los retos. No mezclarlos.
+
+   Fotos: cada ministerio y cada área admiten `imagen`. Mientras valga null, la
+   web dibuja un degradado de marca en su lugar, así que la sección funciona
+   completa sin fotos. Para poner una real:
+     1. Guarda el archivo en assets/img/ministerios/  (ver el README de ahí)
+     2. Escribe la ruta, por ejemplo:  imagen: <ruta a assets/img/ministerios/>
+   El generador del archivo único incrusta esas fotos automáticamente.
+   ------------------------------------------------------------------------- */
+const REQUISITO_SERVIR = {
+  titulo: "Antes de servir hay un camino",
+  texto:
+    "Para unirse a cualquier ministerio, sin excepción, es indispensable haber completado primero el Discipulado (las clases de preparación) y haberse bautizado. Solo después del bautismo puedes integrarte a un equipo de servicio.",
+  pasos: [
+    { titulo: "Discipulado", detalle: "Las clases de preparación. Aquí se aprenden las bases de la fe, sin prisa y sin exámenes sorpresa." },
+    { titulo: "Bautismo", detalle: "El paso público. Es la decisión personal de seguir a Cristo, y es lo que abre la puerta al servicio." },
+    { titulo: "Eliges tu área", detalle: "Hablas con un líder, cuentas qué se te da bien y te sumas al ministerio que encaje contigo." }
+  ]
+};
+
+const MINISTERIOS = [
+  {
+    id: "vip",
+    nombre: "V.I.P.",
+    subtitulo: "Bienvenida y recepción",
+    icono: "👋",
+    color: "magenta",
+    descripcion:
+      "Los primeros que ve alguien cuando llega. Recibes, ubicas y te aseguras de que nadie se sienta perdido en su primera vez.",
+    imagen: null,
+    areas: []
+  },
+  {
+    id: "multimedia",
+    nombre: "Multimedia",
+    subtitulo: "Todo lo que se ve y se escucha",
+    icono: "🎛️",
+    color: "cian",
+    descripcion:
+      "Sin este equipo no se ve ni se oye nada. Si te gusta la técnica o la cámara, este es tu sitio.",
+    imagen: null,
+    areas: [
+      { nombre: "Fotos",  icono: "📷", imagen: null },
+      { nombre: "Luces",  icono: "💡", imagen: null },
+      { nombre: "Sonido", icono: "🎚️", imagen: null }
+    ]
+  },
+  {
+    id: "banda",
+    nombre: "Banda",
+    subtitulo: "Los que dirigen la adoración",
+    icono: "🎸",
+    color: "violeta",
+    descripcion:
+      "Se ensaya, se llega temprano y se toca con excelencia. No hace falta ser un profesional, sí compromiso.",
+    imagen: null,
+    areas: [
+      { nombre: "Cantar",   icono: "🎤", imagen: null },
+      { nombre: "Batería",  icono: "🥁", imagen: null },
+      { nombre: "Guitarra", icono: "🎸", imagen: null },
+      { nombre: "Piano",    icono: "🎹", imagen: null },
+      { nombre: "Bajo",     icono: "🎵", imagen: null }
+    ]
+  },
+  {
+    id: "ujier",
+    nombre: "Ujier",
+    subtitulo: "Logística y orden",
+    icono: "🧭",
+    color: "fuego",
+    descripcion:
+      "Que todo esté donde tiene que estar, antes, durante y después del servicio. El trabajo que casi nadie ve y sin el que nada funciona.",
+    imagen: null,
+    areas: []
+  }
+];
+
+/* ---------------------------------------------------------------------------
+   5. Gamificación: equipos de reto (distintos de los ministerios)
    ------------------------------------------------------------------------- */
 const EQUIPOS = [
   { id: "encendidos", nombre: "Encendidos", emoji: "🔥", color: "fuego", puntos: 1840, miembros: 24 },
@@ -264,18 +345,21 @@ const LOGROS = [
 ];
 
 /* ---------------------------------------------------------------------------
-   5. Checklist de datos por completar
+   6. Checklist de datos por completar
    Panel del prototipo (botón flotante). Al abrirlo se resaltan en la página
    los bloques que todavía muestran un placeholder.
    Para producción: borrar este array y el panel #panel-pendientes del HTML.
 
    Ya resueltos por el liderazgo: dirección, correo, misión, visión, valores,
-   rango de edad, nombres de líderes. El feed social se retiró del proyecto, así
-   que los permisos de imagen y el aviso de privacidad dejan de ser necesarios
-   para esta web (siguen siendo relevantes para lo que se publique en Instagram). Confirmados como inexistentes (no son pendientes):
+   rango de edad, nombres de líderes.
+
+   Aviso: al volver a haber fotos de jóvenes (las de los ministerios), vuelve a
+   hacer falta el permiso de imagen de quienes salgan y sean menores de edad.
+   El formulario está en docs/autorizacion-uso-de-imagen.html. Confirmados como inexistentes (no son pendientes):
    lema, WhatsApp, TikTok, YouTube, Facebook y actividad entre semana.
    ------------------------------------------------------------------------- */
 const PENDIENTES = [
+  { campo: "Fotos de los jóvenes sirviendo en cada área", donde: "Servir", archivo: "assets/img/ministerios/ + data.js → MINISTERIOS[].imagen y .areas[].imagen" },
   { campo: "Logo en alta resolución (PNG/SVG)", donde: "Toda la web", archivo: "assets/ (hoy el emblema es una reconstrucción en SVG)" },
   { campo: "Revisión pastoral de los 7 devocionales de ejemplo", donde: "Racha", archivo: "data.js → DEVOCIONALES con revisado: false" },
   { campo: "Fechas de campamento, conferencia y torneo, cuando se confirmen", donde: "Anuncios", archivo: "data.js → ANUNCIOS (añadir una tarjeta por evento)" }

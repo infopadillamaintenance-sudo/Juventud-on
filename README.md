@@ -3,7 +3,7 @@
 Landing page / aplicación web para **Juventud ON**, el ministerio juvenil de la iglesia
 **Odres Nuevos** (Aruba). Está pensada como una app juvenil y gamificada —no como un sitio
 institucional de iglesia— con devocional diario tipo racha, racha de asistencia a los
-viernes, anuncios oficiales y retos en equipo.
+viernes, ministerios de servicio, anuncios oficiales y retos en equipo.
 
 > **Servicio:** todos los viernes a las 7:30pm · Iglesia Odres Nuevos, Paradera 4, Aruba
 > **Edades:** 13 a 25 años
@@ -41,6 +41,7 @@ assets/
 src/input.css                 Fuente del CSS (paleta, componentes, animaciones)
 tools/build-single-file.mjs   Genera dist/juventud-on.html
 dist/juventud-on.html         Versión de un solo archivo, lista para enviar
+assets/img/ministerios/       Fotos de los equipos sirviendo (ver el README de ahí)
 docs/                         Plantillas para el ministerio (permiso de imagen, devocionales)
 contexto/                     Los documentos de contexto del ministerio
 ```
@@ -57,11 +58,33 @@ Casi todo se edita en **`assets/js/data.js`**, sin tocar el HTML:
 | Misión, visión, valores | `CONFIG.mision`, `CONFIG.vision`, `CONFIG.valores` |
 | Devocionales | `DEVOCIONALES` |
 | Anuncios de líderes y capitanes | `ANUNCIOS` |
-| Equipos y retos | `EQUIPOS`, `RETOS` |
+| Requisito para servir y sus 3 pasos | `REQUISITO_SERVIR` |
+| Ministerios, sus áreas y sus fotos | `MINISTERIOS` |
+| Equipos de reto y retos | `EQUIPOS`, `RETOS` |
 | Insignias | `LOGROS` |
 
 Después de editar `data.js` solo hay que recargar la página. **No hace falta compilar nada**
 salvo que cambies estilos.
+
+### Cuidado con la palabra "equipo"
+
+En el proyecto hay dos cosas distintas que se podrían llamar igual, y conviene no
+mezclarlas:
+
+- **`MINISTERIOS`** — las áreas de servicio reales: V.I.P., Multimedia, Banda y Ujier.
+  Viven en la pestaña **Servir** y para entrar hace falta Discipulado y bautismo.
+- **`EQUIPOS`** — los equipos de competición de la gamificación (Encendidos, Voltaje,
+  Corriente, Chispa). Viven en la pestaña **Retos** y solo sirven para sumar puntos.
+
+### Fotos de los ministerios
+
+Cada ministerio y cada área tienen una propiedad `imagen`. Mientras valga `null`, la web
+dibuja un degradado de marca con el texto "Aquí va una foto del equipo", así que la
+sección se ve completa desde el primer día. Para poner fotos reales, sigue las
+instrucciones de `assets/img/ministerios/README.md`.
+
+El generador del archivo único incrusta esas fotos en base64, así que
+`dist/juventud-on.html` sigue funcionando aunque se envíe suelto por WhatsApp.
 
 ### Dos marcadores que no significan lo mismo
 
@@ -92,14 +115,17 @@ aparece un marcador `[COMPLETAR]` en color ámbar.
 Para verlos todos: pulsa el botón **⚠ Por completar** (abajo a la derecha). Se abre un panel
 con la lista y, mientras está abierto, se resaltan en la página los bloques afectados.
 
-Quedan **3 pendientes**:
+Quedan **4 pendientes**:
 
-1. **Logo en alta resolución** (PNG o SVG). El emblema actual es una reconstrucción hecha a
+1. **Fotos de los jóvenes sirviendo** en cada ministerio y área. Al volver a haber fotos de
+   personas, vuelve a hacer falta el permiso de imagen de los menores que salgan: el
+   formulario está en `docs/autorizacion-uso-de-imagen.html`.
+2. **Logo en alta resolución** (PNG o SVG). El emblema actual es una reconstrucción hecha a
    partir de la captura de Instagram: sirve para el prototipo, no como archivo final.
-2. **Contenido definitivo de los devocionales.** Los 7 de ejemplo (`revisado: false` en
+3. **Contenido definitivo de los devocionales.** Los 7 de ejemplo (`revisado: false` en
    `data.js`) llevan un aviso hasta que se aprueben o se sustituyan. Los dos del liderazgo
    ya salen sin aviso. Formato para enviar los nuevos: `docs/plantilla-devocionales.md`.
-3. **Fechas de campamento, conferencia y torneo**, cuando se confirmen. Hoy hay un único
+4. **Fechas de campamento, conferencia y torneo**, cuando se confirmen. Hoy hay un único
    anuncio de "Nuevas actividades muy pronto"; cada evento confirmado se añade como una
    tarjeta propia en `ANUNCIOS`.
 

@@ -48,6 +48,7 @@
     <nav class="ml-auto hidden items-center gap-1 md:flex" aria-label="Secciones">
       <button data-ir="inicio"   class="nav-desktop">Inicio</button>
       <button data-ir="racha"    class="nav-desktop">Racha</button>
+      <button data-ir="servir"   class="nav-desktop">Servir</button>
       <button data-ir="anuncios" class="nav-desktop">Anuncios</button>
       <button data-ir="retos"    class="nav-desktop">Retos</button>
     </nav>
@@ -150,6 +151,11 @@
         <span class="icono-feature bg-violeta-500/15 text-violeta-400">🎮</span>
         <span><span class="titulo-feature">Retos en equipo</span>
         <span class="texto-feature">Compite con tu equipo, suma puntos y sube en la tabla.</span></span>
+      </button>
+      <button data-ir="servir" class="tarjeta-feature group sm:col-span-2">
+        <span class="icono-feature bg-ambar-500/15 text-ambar-500">🙌</span>
+        <span><span class="titulo-feature">Únete a un ministerio</span>
+        <span class="texto-feature">V.I.P., Multimedia, Banda o Ujier. Mira lo que hace cada uno y qué hace falta para entrar.</span></span>
       </button>
     </div>
 
@@ -275,6 +281,45 @@
     <button id="btn-reset" class="mt-6 text-sm text-white/35 underline underline-offset-4 hover:text-rojo-500">Reiniciar mi progreso</button>
   </section>
 
+  <!-- ══════════════════════════ SERVIR ══════════════════════════ -->
+  <section id="vista-servir" class="vista hidden" aria-labelledby="t-servir">
+    <h2 id="t-servir" class="titulo-seccion !mt-8">¡Únete a nuestro equipo!</h2>
+    <p class="-mt-4 mb-6 text-white/55">Servir cambia la forma en que vives el viernes. Estos son los ministerios de Juventud ON y lo que hace falta para entrar.</p>
+
+    <!-- Requisito obligatorio -->
+    <article class="relative overflow-hidden rounded-3xl border-2 border-ambar-500/50 bg-ambar-500/[0.07] p-6 sm:p-8">
+      <div class="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full bg-ambar-500/20 blur-[70px]" aria-hidden="true"></div>
+
+      <p class="inline-flex items-center gap-2 rounded-full bg-ambar-500 px-3 py-1 text-xs font-bold uppercase tracking-wider text-noche-950">
+        <span aria-hidden="true">⚠️</span> Requisito obligatorio
+      </p>
+      <h3 id="req-titulo" class="mt-4 text-2xl text-white sm:text-3xl"></h3>
+      <p id="req-texto" class="mt-3 max-w-2xl text-white/80"></p>
+
+      <ol id="req-pasos" class="mt-7 grid gap-3 sm:grid-cols-3"></ol>
+
+      <p class="mt-6 flex items-start gap-2 text-sm text-ambar-500">
+        <span aria-hidden="true">↳</span>
+        <span>Sin excepción: primero Discipulado, después bautismo, y solo entonces se entra a un equipo de servicio.</span>
+      </p>
+    </article>
+
+    <!-- Ministerios -->
+    <h3 class="titulo-seccion">Ministerios disponibles</h3>
+    <div id="grid-ministerios" class="grid gap-4 md:grid-cols-2"></div>
+
+    <!-- Cómo apuntarse -->
+    <article class="tarjeta borde-grad mt-6 p-6 text-center sm:p-8">
+      <p class="text-3xl" aria-hidden="true">🙌</p>
+      <h3 class="mt-3 text-2xl text-white">¿Ya cumples los requisitos?</h3>
+      <p class="mx-auto mt-2 max-w-md text-white/60">Habla con un líder este viernes o escríbenos. Te contamos qué área necesita gente ahora mismo.</p>
+      <div class="mt-6 flex flex-wrap justify-center gap-3">
+        <button data-anuncio="instagram" class="btn-primario">Escribir por Instagram</button>
+        <button data-anuncio="contacto" class="btn-secundario">Ver datos de contacto</button>
+      </div>
+    </article>
+  </section>
+
   <!-- ══════════════════════════ ANUNCIOS ══════════════════════════ -->
   <section id="vista-anuncios" class="vista hidden" aria-labelledby="t-anuncios">
     <h2 id="t-anuncios" class="titulo-seccion !mt-8">Anuncios oficiales</h2>
@@ -336,6 +381,7 @@
   <div class="mx-auto flex max-w-lg">
     <button data-ir="inicio"   class="nav-movil"><span aria-hidden="true">🏠</span>Inicio</button>
     <button data-ir="racha"    class="nav-movil"><span aria-hidden="true">🔥</span>Racha</button>
+    <button data-ir="servir"   class="nav-movil"><span aria-hidden="true">🙌</span>Servir</button>
     <button data-ir="anuncios" class="nav-movil"><span aria-hidden="true">📣</span>Anuncios</button>
     <button data-ir="retos"    class="nav-movil"><span aria-hidden="true">🎮</span>Retos</button>
   </div>

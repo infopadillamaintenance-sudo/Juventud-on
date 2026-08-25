@@ -96,7 +96,7 @@
 
   /* ---------------------------------------------------------------- navegación */
 
-  const VISTAS = ["inicio", "racha", "anuncios", "retos"];
+  const VISTAS = ["inicio", "racha", "servir", "anuncios", "retos"];
 
   function ir(vista) {
     if (!VISTAS.includes(vista)) vista = "inicio";
@@ -383,7 +383,7 @@
     }).join("");
   }
 
-  /* ---------------------------------------------------------------- anuncios */
+  /* ---------------------------------------------------------------- servir */
 
   const COLORES = {
     violeta: ["border-violeta-500/40", "bg-violeta-500/15", "text-violeta-400"],
@@ -392,6 +392,66 @@
     fuego:   ["border-fuego-500/40",   "bg-fuego-500/15",   "text-fuego-400"],
     ambar:   ["border-ambar-500/40",   "bg-ambar-500/15",   "text-ambar-500"]
   };
+
+  /**
+   * Atributos de fondo para una foto: la imagen real si existe, y si no un
+   * degradado de marca de los que ya usa el resto del sitio.
+   * `semilla` solo sirve para que dos bloques contiguos no salgan iguales.
+   */
+  function fondo(imagen, semilla, marcarPendiente) {
+    if (imagen) {
+      return `class="relative bg-cover bg-center" style="background-image:url('${esc(imagen)}')"`;
+    }
+    // Sin foto: degradado de marca. Solo se marca como pendiente la imagen
+    // principal del ministerio; hacerlo también en cada área satura la vista.
+    return `class="ph ph-${(semilla % 8) + 1} relative"${marcarPendiente ? " data-pendiente" : ""}`;
+  }
+
+  function pintarServir() {
+    $("#req-titulo").textContent = REQUISITO_SERVIR.titulo;
+    $("#req-texto").textContent = REQUISITO_SERVIR.texto;
+
+    // Numeración explícita: es una secuencia real (Discipulado → bautismo →
+    // servicio), no un adorno.
+    $("#req-pasos").innerHTML = REQUISITO_SERVIR.pasos.map((p, i) => `
+      <li class="rounded-2xl border border-white/10 bg-noche-900/60 p-4">
+        <span class="grid h-8 w-8 place-items-center rounded-full bg-ambar-500 font-display text-base text-noche-950">${i + 1}</span>
+        <p class="mt-3 font-display text-lg uppercase text-white">${esc(p.titulo)}</p>
+        <p class="mt-1 text-sm text-white/55">${esc(p.detalle)}</p>
+      </li>`).join("");
+
+    $("#grid-ministerios").innerHTML = MINISTERIOS.map((m, iM) => {
+      const [borde, tinte, texto] = COLORES[m.color] || COLORES.violeta;
+
+      const areas = m.areas.length ? `
+        <p class="mt-5 text-xs font-bold uppercase tracking-wider text-white/40">Áreas</p>
+        <ul class="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-5 md:grid-cols-3 lg:grid-cols-5">
+          ${m.areas.map((ar, iA) => `
+            <li class="overflow-hidden rounded-xl border border-white/10 bg-noche-900/60">
+              <span ${fondo(ar.imagen, iM * 3 + iA + 1, false)} style="display:grid;place-items:center;aspect-ratio:1">
+                <span class="relative z-10 text-xl drop-shadow-lg" aria-hidden="true">${ar.icono}</span>
+              </span>
+              <span class="block px-1 py-1.5 text-center text-[0.7rem] font-semibold text-white/75">${esc(ar.nombre)}</span>
+            </li>`).join("")}
+        </ul>` : "";
+
+      return `<article class="tarjeta overflow-hidden">
+        <div ${fondo(m.imagen, iM, true)} style="aspect-ratio:16/7;width:100%">
+          ${m.imagen ? "" : `<span class="absolute inset-0 z-10 grid place-items-center text-xs font-semibold text-white/45">
+            📷 Aquí va una foto del equipo</span>`}
+          <span class="absolute bottom-3 left-3 z-10 grid h-12 w-12 place-items-center rounded-2xl border ${borde} ${tinte} bg-noche-950/60 text-2xl backdrop-blur-sm" aria-hidden="true">${m.icono}</span>
+        </div>
+        <div class="p-5 sm:p-6">
+          <p class="text-[0.65rem] font-bold uppercase tracking-wider ${texto}">${esc(m.subtitulo)}</p>
+          <h4 class="display mt-1 text-2xl text-white">${esc(m.nombre)}</h4>
+          <p class="mt-2 text-sm text-white/60">${esc(m.descripcion)}</p>
+          ${areas}
+        </div>
+      </article>`;
+    }).join("");
+  }
+
+  /* ---------------------------------------------------------------- anuncios */
 
   function pintarAnuncios() {
     $("#lista-anuncios").innerHTML = ANUNCIOS.map((a) => {
@@ -597,6 +657,7 @@
     pintarDevocional();
     pintarAsistencia();
     pintarLogros();
+    pintarServir();
     pintarAnuncios();
     pintarEquipos();
     pintarRetos();

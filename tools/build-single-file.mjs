@@ -7,7 +7,7 @@
  *   node tools/build-single-file.mjs                  → dist/juventud-on.html
  *   node tools/build-single-file.mjs --body-only ruta → sin <html>/<head>/<body>
  */
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -26,7 +26,24 @@ css = css.replace(/url\(["']?\.\.\/fonts\/([^"')]+)["']?\)/g, (_, archivo) => {
   return `url("data:font/woff2;base64,${b64}")`;
 });
 
-/* --- 2. HTML con CSS y JS en línea --- */
+/* --- 2. Fotos de los ministerios incrustadas en base64 ---
+   Sin esto, un data.js que apunte a assets/img/... dejaría el archivo único
+   con las fotos rotas en cuanto se enviara suelto por WhatsApp o correo. */
+const TIPOS = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", avif: "image/avif", gif: "image/gif" };
+
+function incrustarImagenes(js) {
+  return js.replace(/"(assets\/img\/[^"]+\.(jpg|jpeg|png|webp|avif|gif))"/gi, (original, ruta, ext) => {
+    const absoluta = resolve(raiz, ruta);
+    if (!existsSync(absoluta)) {
+      console.warn(`  ⚠ falta la imagen ${ruta} — se deja la ruta tal cual`);
+      return original;
+    }
+    const b64 = readFileSync(absoluta).toString("base64");
+    return `"data:${TIPOS[ext.toLowerCase()]};base64,${b64}"`;
+  });
+}
+
+/* --- 3. HTML con CSS y JS en línea --- */
 let html = leer("index.html");
 // Ojo: se usan funciones de reemplazo, no cadenas. Con cadenas, secuencias como
 // `$$` o `$&` dentro del CSS/JS se interpretarían como patrones de sustitución
@@ -39,10 +56,10 @@ html = html.replace(
   () => `<style>\n${css}\n</style>`
 ).replace(
   /<script src="assets\/js\/data\.js"><\/script>\s*<script src="assets\/js\/app\.js"><\/script>/,
-  () => `<script>\n${leer("assets/js/data.js")}\n${leer("assets/js/app.js")}\n</script>`
+  () => `<script>\n${incrustarImagenes(leer("assets/js/data.js"))}\n${leer("assets/js/app.js")}\n</script>`
 );
 
-/* --- 3. Modo "solo cuerpo" (para incrustar en otra página) --- */
+/* --- 4. Modo "solo cuerpo" (para incrustar en otra página) --- */
 if (soloCuerpo) {
   // Solo el título y los estilos: quien incruste la página aporta su propio
   // <head> (charset, viewport y metaetiquetas).
