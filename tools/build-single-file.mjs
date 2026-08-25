@@ -44,12 +44,13 @@ html = html.replace(
 
 /* --- 3. Modo "solo cuerpo" (para incrustar en otra página) --- */
 if (soloCuerpo) {
-  const cabeza = html.match(/<head>([\s\S]*?)<\/head>/)[1];
+  // Solo el título y los estilos: quien incruste la página aporta su propio
+  // <head> (charset, viewport y metaetiquetas).
+  const estilos = html.match(/<style>[\s\S]*?<\/style>/)[0];
   const cuerpo = html.match(/<body[^>]*>([\s\S]*?)<\/body>/)[1];
   const clasesBody = html.match(/<body class="([^"]*)"/)?.[1] ?? "";
-  html =
-    cabeza.replace(/<meta charset[^>]*>\s*/, () => "").trim() +
-    `\n<div class="${clasesBody}">\n` + cuerpo.trim() + "\n</div>\n";
+  html = `<title>Juventud ON</title>\n${estilos}\n<div class="${clasesBody}">\n` +
+         cuerpo.trim() + "\n</div>\n";
 }
 
 mkdirSync(resolve(raiz, dirname(salida)), { recursive: true });

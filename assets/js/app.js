@@ -100,7 +100,11 @@
     VISTAS.forEach((v) => $("#vista-" + v).classList.toggle("hidden", v !== vista));
     $$("[data-ir]").forEach((b) =>
       b.setAttribute("aria-current", b.dataset.ir === vista ? "page" : "false"));
-    if (location.hash.slice(1) !== vista) history.replaceState(null, "", "#" + vista);
+    // En algunos contextos (iframe en sandbox, file://) replaceState lanza
+    // SecurityError. La navegación ya funcionó, así que no debe romper nada.
+    try {
+      if (location.hash.slice(1) !== vista) history.replaceState(null, "", "#" + vista);
+    } catch (e) { /* sin cambio de URL, la navegación sigue funcionando */ }
     window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
   }
 
