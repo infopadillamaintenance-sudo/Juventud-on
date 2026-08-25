@@ -171,21 +171,27 @@
              class="font-semibold text-cian-400 underline underline-offset-2">Cómo llegar</a>`
         : "");
 
-    // El Instagram va primero porque es el canal por el que sí responden.
+    // El Instagram va primero porque es el canal por el que más responden.
     // Las filas con valor null (no existen) se omiten enteras, sin dejar hueco.
-    const contacto = [
-      ["📸", "Instagram", `<a href="${CONFIG.redes.instagram.url}" target="_blank" rel="noopener"
-            class="font-semibold text-white underline underline-offset-2">${esc(CONFIG.redes.instagram.handle)}</a>
-            <span class="text-white/45">— escríbenos por mensaje directo</span>`],
-      ["✉️", "Correo", CONFIG.contacto.email],
-      ["💬", "WhatsApp", CONFIG.contacto.whatsapp],
-      ["📞", "Teléfono", CONFIG.contacto.telefono]
-    ].filter(([, , valor]) => valor != null);
+    const enlace = "font-semibold text-white underline underline-offset-2 break-all";
+    const filas = [
+      { icono: "📸", etiqueta: "Instagram",
+        html: `<a href="${CONFIG.redes.instagram.url}" target="_blank" rel="noopener" class="${enlace}">${esc(CONFIG.redes.instagram.handle)}</a>
+               <span class="text-white/45">— por mensaje directo</span>` },
+      { icono: "✉️", etiqueta: "Correo", valor: CONFIG.contacto.email, esquema: "mailto:" },
+      { icono: "💬", etiqueta: "WhatsApp", valor: CONFIG.contacto.whatsapp, esquema: "https://wa.me/" },
+      { icono: "📞", etiqueta: "Teléfono", valor: CONFIG.contacto.telefono, esquema: "tel:" }
+    ].filter((f) => f.html || f.valor != null);
 
-    $("#lista-contacto").innerHTML = contacto.map(([ic, etiqueta, valor], i) => `
-      <li class="flex gap-3"><span aria-hidden="true">${ic}</span>
-        <span><strong class="text-white">${etiqueta}</strong><br>
-        <span class="text-sm">${i === 0 ? valor : dato(valor)}</span></span></li>`).join("");
+    $("#lista-contacto").innerHTML = filas.map((f) => {
+      let cuerpo;
+      if (f.html) cuerpo = f.html;
+      else if (f.valor === PENDIENTE) cuerpo = dato(f.valor);
+      else cuerpo = `<a href="${esc(f.esquema + String(f.valor).replace(/\s/g, ""))}" class="${enlace}">${esc(f.valor)}</a>`;
+      return `<li class="flex gap-3"><span aria-hidden="true">${f.icono}</span>
+        <span><strong class="text-white">${f.etiqueta}</strong><br>
+        <span class="text-sm">${cuerpo}</span></span></li>`;
+    }).join("");
 
     // Solo las redes que el ministerio realmente tiene. El Instagram propio no
     // se repite aquí: ya aparece arriba como vía de contacto.

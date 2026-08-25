@@ -7,7 +7,7 @@ viernes, feed social, anuncios oficiales y retos en equipo.
 
 > **Servicio:** todos los viernes a las 7:30pm · Iglesia Odres Nuevos, Paradera 4, Aruba
 > **Edades:** 13 a 25 años
-> **Instagram:** [@juventud.on](https://www.instagram.com/juventud.on)
+> **Instagram:** [@juventud.on](https://www.instagram.com/juventud.on) · **Correo:** juventudon1@gmail.com
 > **Líderes:** Eider y Nancy Mendoza
 
 ---
@@ -92,22 +92,19 @@ aparece un marcador `[COMPLETAR]` en color ámbar.
 Para verlos todos: pulsa el botón **⚠ Por completar** (abajo a la derecha). Se abre un panel
 con la lista y, mientras está abierto, se resaltan en la página los bloques afectados.
 
-Quedan **6 pendientes**:
+Quedan **5 pendientes**:
 
-1. **Correo de contacto real.** `juventudon@ejemplo.com` no se puso en la web a propósito:
-   `ejemplo.com` es un dominio reservado para ejemplos y cualquier mensaje enviado ahí
-   rebotaría. Mientras tanto, la sección de contacto lleva al Instagram, que sí funciona.
-2. **Logo en alta resolución** (PNG o SVG). El emblema actual es una reconstrucción hecha a
+1. **Logo en alta resolución** (PNG o SVG). El emblema actual es una reconstrucción hecha a
    partir de la captura de Instagram: sirve para el prototipo, no como archivo final.
-3. **Fotos reales y permiso de imagen** de los jóvenes que aparezcan.
-4. **Revisión pastoral de los 7 devocionales de ejemplo** (`revisado: false` en `data.js`).
+2. **Fotos reales y permiso de imagen** de los jóvenes que aparezcan.
+3. **Revisión pastoral de los 7 devocionales de ejemplo** (`revisado: false` en `data.js`).
    Los dos del liderazgo ya están marcados como revisados y la web los muestra sin aviso.
-5. **Aviso de privacidad** para menores de edad, en el pie de página.
-6. **Fechas de campamento, conferencia y torneo**, cuando se confirmen. Hoy hay un único
+4. **Aviso de privacidad** para menores de edad, en el pie de página.
+5. **Fechas de campamento, conferencia y torneo**, cuando se confirmen. Hoy hay un único
    anuncio de "Nuevas actividades muy pronto"; cada evento confirmado se añade como una
    tarjeta propia en `ANUNCIOS`.
 
-Ya resueltos: dirección, misión, visión, valores, rango de edad y nombres de líderes.
+Ya resueltos: dirección, correo, misión, visión, valores, rango de edad y nombres de líderes.
 Confirmados como inexistentes (y por eso ya no son pendientes): lema, WhatsApp, TikTok,
 YouTube, Facebook y actividad entre semana.
 

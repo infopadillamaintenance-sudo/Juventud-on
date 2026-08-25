@@ -59,10 +59,7 @@ const CONFIG = {
   },
 
   contacto: {
-    // Sigue PENDIENTE a propósito: "juventudon@ejemplo.com" es una dirección de
-    // ejemplo (ejemplo.com es un dominio reservado) y rebotaría. En cuanto
-    // tengan un correo real, se pone aquí y aparece en la web.
-    email: PENDIENTE,
+    email: "juventudon1@gmail.com",
     whatsapp: null, // no tienen WhatsApp de contacto
     telefono: null
   },
@@ -289,12 +286,11 @@ const LOGROS = [
    los bloques que todavía muestran un placeholder.
    Para producción: borrar este array y el panel #panel-pendientes del HTML.
 
-   Ya resueltos por el liderazgo: dirección, misión, visión, valores, rango de
-   edad, nombres de líderes. Confirmados como inexistentes (no son pendientes):
+   Ya resueltos por el liderazgo: dirección, correo, misión, visión, valores,
+   rango de edad, nombres de líderes. Confirmados como inexistentes (no son pendientes):
    lema, WhatsApp, TikTok, YouTube, Facebook y actividad entre semana.
    ------------------------------------------------------------------------- */
 const PENDIENTES = [
-  { campo: "Correo de contacto real", donde: "Info y contacto", archivo: "data.js → CONFIG.contacto.email (hoy solo se ofrece el Instagram, que sí funciona)" },
   { campo: "Logo en alta resolución (PNG/SVG)", donde: "Toda la web", archivo: "assets/ (hoy el emblema es una reconstrucción en SVG)" },
   { campo: "Fotos reales + permiso de imagen de los jóvenes", donde: "Feed", archivo: "data.js → FEED (hoy son degradados de ejemplo)" },
   { campo: "Revisión pastoral de los 7 devocionales de ejemplo", donde: "Racha", archivo: "data.js → DEVOCIONALES con revisado: false" },
