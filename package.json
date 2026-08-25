@@ -1,0 +1,16 @@
+{
+  "name": "juventud-on",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Landing page / app web del ministerio juvenil Juventud ON (iglesia Odres Nuevos, Aruba)",
+  "scripts": {
+    "css": "tailwindcss -i ./src/input.css -o ./assets/css/juventud-on.css --minify",
+    "css:watch": "tailwindcss -i ./src/input.css -o ./assets/css/juventud-on.css --watch",
+    "build": "npm run css && node tools/build-single-file.mjs",
+    "serve": "python3 -m http.server 8080"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.11",
+    "tailwindcss": "^4.1.11"
+  }
+}
