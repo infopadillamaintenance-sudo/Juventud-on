@@ -121,11 +121,18 @@
         </div>
       </div>
 
-      <dl class="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div class="tarjeta-stat"><dt>Seguidores en IG</dt><dd>24.7 mil</dd></div>
-        <div class="tarjeta-stat"><dt>Publicaciones</dt><dd>1,239</dd></div>
-        <div class="tarjeta-stat"><dt>Servicio</dt><dd>Viernes 7:30pm</dd></div>
-        <div class="tarjeta-stat"><dt>Dónde</dt><dd>Odres Nuevos, Aruba</dd></div>
+      <!-- Los dos datos que de verdad necesita alguien que quiere venir.
+           Al quedar solo dos, se les da más aire y tamaño en vez de dejarlos
+           flotando en una rejilla pensada para cuatro. -->
+      <dl class="mt-12 grid gap-3 sm:max-w-2xl sm:grid-cols-2">
+        <div class="tarjeta-stat flex items-center gap-4 !px-5 !py-4">
+          <span class="text-2xl" aria-hidden="true">🕖</span>
+          <span><dt>Cuándo</dt><dd class="!text-xl">Viernes 7:30pm</dd></span>
+        </div>
+        <div class="tarjeta-stat flex items-center gap-4 !px-5 !py-4">
+          <span class="text-2xl" aria-hidden="true">📍</span>
+          <span><dt>Dónde</dt><dd class="!text-xl">Odres Nuevos, Aruba</dd></span>
+        </div>
       </dl>
     </div>
 
@@ -388,12 +395,56 @@
 </nav>
 
 <!-- ══════════════════════════ PANEL DE PENDIENTES (solo prototipo) ══════════════════════════ -->
+<!-- ══════════════════════════ ENVIAR PRUEBA DE UN RETO ══════════════════════════ -->
+<div id="modal-envio" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="envio-titulo">
+  <form id="form-envio" class="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-3xl border border-white/10 bg-noche-900 p-6 sin-scrollbar">
+    <div class="flex items-start justify-between gap-3">
+      <div class="min-w-0">
+        <p class="text-[0.65rem] font-bold uppercase tracking-wider text-ambar-500" id="envio-puntos"></p>
+        <h2 id="envio-titulo" class="mt-1 text-2xl text-white"></h2>
+        <p id="envio-detalle" class="mt-1 text-sm text-white/55"></p>
+      </div>
+      <button type="button" id="cerrar-envio" class="shrink-0 rounded-full border border-white/10 px-3 py-1.5 text-sm text-white/60 hover:bg-white/10" aria-label="Cerrar">✕</button>
+    </div>
+
+    <div class="mt-5 rounded-xl border border-cian-400/25 bg-cian-400/5 p-3 text-xs text-white/70">
+      Al enviar, el reto queda <strong class="text-cian-400">pendiente de verificación</strong>. Los puntos se suman solo cuando un líder lo aprueba.
+    </div>
+
+    <label for="envio-texto" class="mt-5 block text-sm font-semibold text-white">¿Cómo lo cumpliste?</label>
+    <textarea id="envio-texto" rows="3" maxlength="280" required
+      placeholder="Cuéntalo en una o dos frases. Ej: vine el viernes con Andrés, era su primera vez."
+      class="mt-2 w-full rounded-xl border border-white/10 bg-noche-800 px-4 py-3 text-white placeholder:text-white/30"></textarea>
+
+    <label for="envio-foto" class="mt-4 block text-sm font-semibold text-white">Foto de prueba <span class="font-normal text-white/40">(opcional)</span></label>
+    <input id="envio-foto" type="file" accept="image/*"
+      class="mt-2 w-full rounded-xl border border-white/10 bg-noche-800 px-4 py-3 text-sm text-white/70 file:mr-3 file:rounded-lg file:border-0 file:bg-violeta-500 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-white">
+    <div id="envio-vista" class="mt-3 hidden"></div>
+
+    <div class="mt-6 flex gap-2">
+      <button class="btn-primario flex-1 justify-center">Enviar para revisión</button>
+    </div>
+  </form>
+</div>
+
+<!-- ══════════ HERRAMIENTAS DE ADMINISTRACIÓN ══════════
+     Ocultas para el público. Solo aparecen con ?admin=true en la URL
+     (o al abrir el sitio en local, mientras se desarrolla).
+     Ver `esModoAdmin()` en assets/js/app.js. -->
+<div id="barra-admin" class="fixed bottom-20 right-4 z-40 hidden flex-col items-end gap-2 md:bottom-6">
+<button id="btn-revision" title="Revisar retos enviados"
+  class="flex items-center gap-2 rounded-full border border-cian-400/40 bg-noche-900/90 px-3 py-2.5 text-sm font-bold text-cian-400 backdrop-blur-xl md:px-4">
+  <span aria-hidden="true">🛡️</span>
+  <span class="hidden sm:inline">Revisar retos</span>
+  <span id="num-revision" class="rounded-full bg-cian-400 px-1.5 text-noche-950">0</span>
+</button>
 <button id="btn-pendientes" title="Datos por completar"
-  class="fixed bottom-20 right-4 z-40 flex items-center gap-2 rounded-full border border-ambar-500/40 bg-noche-900/90 px-3 py-2.5 text-sm font-bold text-ambar-400 backdrop-blur-xl md:bottom-6 md:px-4">
+  class="flex items-center gap-2 rounded-full border border-ambar-500/40 bg-noche-900/90 px-3 py-2.5 text-sm font-bold text-ambar-400 backdrop-blur-xl md:px-4">
   <span aria-hidden="true">⚠</span>
   <span class="hidden sm:inline">Por completar</span>
   <span id="num-pendientes" class="rounded-full bg-ambar-500 px-1.5 text-noche-950">0</span>
 </button>
+</div>
 
 <aside id="panel-pendientes" class="fixed inset-y-0 right-0 z-50 hidden w-full max-w-md overflow-y-auto border-l border-white/10 bg-noche-900 p-6 shadow-2xl" aria-label="Datos por completar">
   <div class="flex items-start justify-between gap-4">
@@ -406,6 +457,20 @@
   <ol id="lista-pendientes" class="mt-6 space-y-3"></ol>
   <p class="mt-6 rounded-xl border border-white/10 bg-white/5 p-4 text-xs text-white/45">
     Este panel es solo del prototipo. Para publicar: borra <code class="text-white/70">#btn-pendientes</code> y <code class="text-white/70">#panel-pendientes</code> de <code class="text-white/70">index.html</code>.
+  </p>
+</aside>
+
+<aside id="panel-revision" class="fixed inset-y-0 right-0 z-50 hidden w-full max-w-md overflow-y-auto border-l border-white/10 bg-noche-900 p-6 shadow-2xl" aria-label="Revisión de retos">
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h2 class="text-2xl text-cian-400">Revisar retos</h2>
+      <p class="mt-2 text-sm text-white/55">Solicitudes enviadas por los jóvenes. Los puntos se asignan solo cuando apruebas.</p>
+    </div>
+    <button id="cerrar-revision" class="rounded-full border border-white/10 px-3 py-1.5 text-white/60 hover:bg-white/10" aria-label="Cerrar panel">✕</button>
+  </div>
+  <div id="lista-revision" class="mt-6 space-y-3"></div>
+  <p class="mt-6 rounded-xl border border-ambar-500/30 bg-ambar-500/10 p-4 text-xs text-ambar-500">
+    <strong>Ojo:</strong> sin servidor, aquí solo se ven las solicitudes hechas <em>en este mismo dispositivo</em>. Para que un líder revise lo que envían los jóvenes desde sus teléfonos hace falta backend y cuentas.
   </p>
 </aside>
 

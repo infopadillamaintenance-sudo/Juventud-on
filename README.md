@@ -166,9 +166,64 @@ Para que funcione de verdad como comunidad hace falta:
 
 1. **Cuentas de usuario**, para que la racha y los puntos sean de la persona y no del navegador.
 2. **Backend y base de datos** para rachas, anuncios y puntajes compartidos.
-3. **Panel de líderes** para publicar anuncios sin tocar código.
+3. **Panel de líderes** real, con cuentas: para publicar anuncios y para aprobar los retos
+   que envían los jóvenes desde sus propios teléfonos (hoy la revisión solo ve lo enviado en
+   el mismo dispositivo).
 4. **Notificaciones** (push o correo) para recordar el devocional y no romper la racha.
 5. **Recompensas** conectadas al marcador de puntos.
+
+---
+
+## Modo administrador
+
+Las herramientas de líder están **ocultas para el público**. Se activan añadiendo
+`?admin=true` al final de la URL:
+
+```
+https://juventud-on.vercel.app/?admin=true
+```
+
+Aparece entonces una barra flotante con dos botones: **Revisar retos** y **Por completar**.
+El modo queda activo durante toda la pestaña (no hay que arrastrar el parámetro al navegar);
+se desactiva con `?admin=false` o cerrando la pestaña. Al abrir el sitio en local también se
+activa solo, para no estorbar mientras se desarrolla.
+
+> **Esto no es seguridad, y conviene tenerlo claro.** Es un sitio estático: cualquiera que
+> escriba `?admin=true` en la barra de direcciones entra. Sirve para que el panel no moleste
+> al público, no para proteger nada. Una contraseña de verdad necesita servidor y cuentas.
+
+## Retos: verificación antes de los puntos
+
+Antes, pulsar "Marcar completado" sumaba los puntos al instante y cualquiera podía inflarse
+el marcador. Ahora el flujo es:
+
+1. El joven pulsa **Enviar prueba** y describe cómo lo cumplió. Puede adjuntar una foto (se
+   reduce a 800 px y se comprime antes de guardarla, porque `localStorage` ronda los 5 MB).
+2. El reto queda **⏳ Pendiente de verificación**. **No suma puntos.**
+3. Un líder abre el panel de revisión y pulsa **Aprobar** o **Rechazar** (con motivo).
+4. Solo al aprobar se suman los puntos. Una aprobación se puede **revocar** después, y los
+   puntos se restan.
+
+El joven ve el estado en su tarjeta, puede cancelar un envío pendiente y volver a enviarlo
+si se lo rechazan.
+
+### Qué resuelve esto y qué no
+
+**Sí resuelve** el problema social: ya no se suman puntos solos, hay que enviar una prueba y
+alguien la revisa. Y deja el modelo de datos exactamente en la forma que necesitará el día
+que haya backend.
+
+**No resuelve** el problema técnico, y hay que decirlo claro:
+
+- Todo corre en el navegador del propio usuario. Quien sepa abrir las herramientas de
+  desarrollo puede editar `localStorage` a mano, o entrar con `?admin=true` y aprobarse sus
+  propios retos.
+- Como el estado vive en cada dispositivo, **un líder solo ve las solicitudes enviadas desde
+  su propio teléfono**. No puede revisar lo que envían los jóvenes desde los suyos.
+
+Ambas cosas se arreglan igual: cuentas de usuario y un servidor que guarde las solicitudes y
+sea el único que pueda aprobarlas. Hasta entonces, esto es el prototipo correcto del flujo,
+no un sistema antitrampas real.
 
 ---
 

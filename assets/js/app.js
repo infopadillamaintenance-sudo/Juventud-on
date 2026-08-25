@@ -74,7 +74,11 @@
     asis:  { ultimo: null, racha: 0, historial: [] },
     puntos: 0,
     equipo: EQUIPOS[0].id,
-    retos: [],          // ids de retos completados
+    // Cada reto enviado guarda su solicitud: nada suma puntos hasta que un
+    // líder lo aprueba desde el panel de revisión.
+    //   { [idReto]: { estado, fecha, prueba: {texto, foto}, motivo } }
+    //   estado ∈ "pendiente" | "aprobado" | "rechazado"
+    solicitudes: {},
     demo: false
   });
 
@@ -84,14 +88,73 @@
     try {
       const crudo = localStorage.getItem(CLAVE);
       if (crudo) estado = Object.assign(estadoInicial(), JSON.parse(crudo));
+
+      // Formato anterior: `retos` era una lista de ids ya completados y los
+      // puntos se daban al instante. Se convierten en solicitudes aprobadas
+      // para no borrarle el progreso a nadie que ya estuviera usando la web.
+      if (Array.isArray(estado.retos)) {
+        estado.retos.forEach((id) => {
+          if (!estado.solicitudes[id]) {
+            estado.solicitudes[id] = { estado: "aprobado", fecha: hoy(), prueba: null, migrado: true };
+          }
+        });
+        delete estado.retos;
+        guardar();
+      }
     } catch (e) {
       /* localStorage bloqueado (modo privado, etc.): seguimos en memoria */
     }
   }
+  /** Devuelve false si no se pudo persistir (cuota llena, modo privado…). */
   function guardar() {
     try {
       localStorage.setItem(CLAVE, JSON.stringify(estado));
-    } catch (e) { /* sin persistencia, pero la sesión sigue funcionando */ }
+      return true;
+    } catch (e) {
+      return false; // sin persistencia, pero la sesión sigue funcionando
+    }
+  }
+
+  /* ---------------------------------------------------------------- modo admin */
+
+  /**
+   * Las herramientas de líder (datos por completar y revisión de retos) están
+   * ocultas para el público y se activan con ?admin=true en la URL, o al abrir
+   * el sitio en local mientras se desarrolla.
+   *
+   * ATENCIÓN: esto NO es seguridad. Es un sitio estático: cualquiera que
+   * escriba ?admin=true en la barra de direcciones entra. Sirve para que el
+   * panel no moleste al público, no para proteger nada. Proteger de verdad
+   * exige cuentas y servidor.
+   */
+  function esModoAdmin() {
+    const p = new URLSearchParams(location.search);
+    if (p.get("admin") === "true") {
+      try { sessionStorage.setItem("juventud-on:admin", "1"); } catch (e) { /* da igual */ }
+      return true;
+    }
+    if (p.get("admin") === "false") {
+      try { sessionStorage.removeItem("juventud-on:admin"); } catch (e) { /* da igual */ }
+      return false;
+    }
+    // Se recuerda durante la pestaña, para no arrastrar ?admin=true al navegar
+    try { if (sessionStorage.getItem("juventud-on:admin")) return true; } catch (e) { /* da igual */ }
+
+    // Desarrollo en local
+    return ["localhost", "127.0.0.1", ""].includes(location.hostname);
+  }
+
+  function aplicarModoAdmin() {
+    const admin = esModoAdmin();
+    document.body.classList.toggle("modo-admin", admin);
+    $("#barra-admin").classList.toggle("hidden", !admin);
+    $("#barra-admin").classList.toggle("flex", admin);
+    if (!admin) {
+      $("#panel-pendientes").classList.add("hidden");
+      $("#panel-revision").classList.add("hidden");
+      document.body.classList.remove("mostrar-pendientes");
+    }
+    return admin;
   }
 
   /* ---------------------------------------------------------------- navegación */
@@ -538,10 +601,45 @@
     }).join("");
   }
 
+  const ETIQUETAS = {
+    pendiente: ["⏳", "Pendiente de verificación", "border-ambar-500/40 bg-ambar-500/10 text-ambar-500"],
+    aprobado:  ["✅", "Aprobado", "border-cian-400/40 bg-cian-400/10 text-cian-400"],
+    rechazado: ["✕",  "Rechazado", "border-rojo-500/40 bg-rojo-500/10 text-rojo-500"]
+  };
+
+  const solicitudDe = (id) => estado.solicitudes[id] || null;
+
   function pintarRetos() {
     $("#grid-retos").innerHTML = RETOS.map((r) => {
-      const hecho = estado.retos.includes(r.id);
-      return `<article class="tarjeta flex flex-col p-5 ${hecho ? "opacity-60" : ""}">
+      const s = solicitudDe(r.id);
+      const st = s && s.estado;
+      const apagado = st === "aprobado" || st === "pendiente";
+
+      let insignia = "";
+      if (st) {
+        const [ic, txt, clase] = ETIQUETAS[st];
+        insignia = `<p class="mt-3 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.7rem] font-bold ${clase}">
+          <span aria-hidden="true">${ic}</span>${txt}${st === "aprobado" ? ` · +${r.puntos}` : ""}</p>`;
+      }
+
+      const motivo = st === "rechazado" && s.motivo
+        ? `<p class="mt-2 rounded-lg border border-rojo-500/25 bg-rojo-500/5 p-2.5 text-xs text-white/70"><strong class="text-rojo-500">Motivo:</strong> ${esc(s.motivo)}</p>`
+        : "";
+
+      const prueba = st === "pendiente" && s.prueba
+        ? `<p class="mt-2 text-xs text-white/45">Enviaste: ${esc(s.prueba.texto)}${s.prueba.foto ? " · con foto" : ""}</p>`
+        : "";
+
+      let boton;
+      if (st === "aprobado") {
+        boton = `<button class="btn-secundario mt-4 w-full justify-center !py-2.5 !text-xs" disabled>✅ Aprobado</button>`;
+      } else if (st === "pendiente") {
+        boton = `<button data-cancelar="${r.id}" class="btn-secundario mt-4 w-full justify-center !py-2.5 !text-xs">Cancelar envío</button>`;
+      } else {
+        boton = `<button data-reto="${r.id}" class="btn-reto mt-4">${st === "rechazado" ? "Volver a enviar" : "Enviar prueba"}</button>`;
+      }
+
+      return `<article class="tarjeta flex flex-col p-5 ${apagado ? "opacity-70" : ""}">
         <div class="flex items-start gap-3">
           <span class="text-2xl" aria-hidden="true">${r.icono}</span>
           <div class="min-w-0 flex-1">
@@ -551,22 +649,160 @@
           </div>
           <span class="shrink-0 rounded-full bg-ambar-500/15 px-2.5 py-1 text-xs font-bold text-ambar-500">+${r.puntos}</span>
         </div>
-        <button data-reto="${r.id}" class="${hecho ? "btn-secundario w-full justify-center !py-2.5 !text-xs" : "btn-reto"} mt-4" ${hecho ? "disabled" : ""}>
-          ${hecho ? "✅ Completado" : "Marcar completado"}
-        </button>
+        ${insignia}${prueba}${motivo}
+        ${boton}
       </article>`;
     }).join("");
   }
 
-  function completarReto(id) {
-    if (estado.retos.includes(id)) return;
+  /* --- Envío de la prueba --------------------------------------------------
+     Aquí no se dan puntos: el reto queda "pendiente" hasta que un líder lo
+     apruebe desde el panel de revisión. */
+
+  /** Reduce la foto antes de guardarla: localStorage ronda los 5 MB y una foto
+   *  de móvil sin tocar se lo come entero. */
+  function comprimirFoto(archivo, ladoMax = 800, calidad = 0.7) {
+    return new Promise((resolver, rechazar) => {
+      if (!archivo.type.startsWith("image/")) return rechazar(new Error("Eso no es una imagen"));
+      const lector = new FileReader();
+      lector.onerror = () => rechazar(new Error("No se pudo leer el archivo"));
+      lector.onload = () => {
+        const img = new Image();
+        img.onerror = () => rechazar(new Error("No se pudo abrir la imagen"));
+        img.onload = () => {
+          const escala = Math.min(1, ladoMax / Math.max(img.width, img.height));
+          const lienzo = document.createElement("canvas");
+          lienzo.width = Math.round(img.width * escala);
+          lienzo.height = Math.round(img.height * escala);
+          lienzo.getContext("2d").drawImage(img, 0, 0, lienzo.width, lienzo.height);
+          resolver(lienzo.toDataURL("image/jpeg", calidad));
+        };
+        img.src = lector.result;
+      };
+      lector.readAsDataURL(archivo);
+    });
+  }
+
+  let fotoEnCurso = null;
+
+  function abrirEnvio(id) {
     const r = RETOS.find((x) => x.id === id);
-    estado.retos.push(id);
-    sumarPuntos(r.puntos);
+    if (!r || (solicitudDe(id) || {}).estado === "pendiente") return;
+
+    fotoEnCurso = null;
+    $("#envio-titulo").textContent = r.titulo;
+    $("#envio-puntos").textContent = `+${r.puntos} puntos si lo aprueban`;
+    $("#envio-detalle").textContent = r.detalle;
+    $("#form-envio").dataset.retoId = id; // no "reto": ese atributo lo usan los botones
+    $("#envio-texto").value = "";
+    $("#envio-foto").value = "";
+    $("#envio-vista").innerHTML = "";
+    $("#envio-vista").classList.add("hidden");
+
+    const m = $("#modal-envio");
+    m.classList.remove("hidden");
+    m.classList.add("flex");
+    document.body.style.overflow = "hidden";
+    $("#envio-texto").focus();
+  }
+
+  function cerrarEnvio() {
+    const m = $("#modal-envio");
+    m.classList.add("hidden");
+    m.classList.remove("flex");
+    document.body.style.overflow = "";
+    fotoEnCurso = null;
+  }
+
+  function enviarSolicitud(id, texto) {
+    estado.solicitudes[id] = {
+      estado: "pendiente",
+      fecha: hoy(),
+      prueba: { texto, foto: fotoEnCurso || null }
+    };
+    if (!guardar() && fotoEnCurso) {
+      // La foto no cupo en localStorage: mejor guardar la solicitud sin ella
+      // que perderla entera.
+      estado.solicitudes[id].prueba.foto = null;
+      guardar();
+      toast("La foto no cabía; se envió solo la descripción");
+    } else {
+      toast("⏳ Enviado. Un líder lo revisará");
+    }
+    pintarRetos();
+    pintarRevision();
+  }
+
+  function cancelarSolicitud(id) {
+    if ((solicitudDe(id) || {}).estado !== "pendiente") return;
+    delete estado.solicitudes[id];
+    guardar();
+    pintarRetos();
+    pintarRevision();
+    toast("Envío cancelado");
+  }
+
+  /* --- Panel de revisión (solo administrador) --- */
+
+  function resolverSolicitud(id, aprobado, motivo) {
+    const s = solicitudDe(id);
+    const r = RETOS.find((x) => x.id === id);
+    if (!s || !r) return;
+
+    const eraAprobado = s.estado === "aprobado";
+    s.estado = aprobado ? "aprobado" : "rechazado";
+    s.motivo = aprobado ? null : (motivo || null);
+
+    // Los puntos se mueven solo cuando el estado cambia de verdad, para que
+    // aprobar dos veces no los duplique ni revocar los reste dos veces.
+    if (aprobado && !eraAprobado) sumarPuntos(r.puntos);
+    if (!aprobado && eraAprobado) sumarPuntos(-r.puntos);
+
     guardar();
     pintarRetos();
     pintarEquipos();
-    toast(`⚡ +${r.puntos} puntos para tu equipo`);
+    pintarRevision();
+    toast(aprobado ? `✅ Aprobado · +${r.puntos} puntos` : "Reto rechazado");
+  }
+
+  function pintarRevision() {
+    const entradas = Object.entries(estado.solicitudes)
+      .map(([id, s]) => [id, s, RETOS.find((r) => r.id === id)])
+      .filter(([, , r]) => r);
+
+    const orden = { pendiente: 0, rechazado: 1, aprobado: 2 };
+    entradas.sort((a, b) => orden[a[1].estado] - orden[b[1].estado]);
+
+    $("#num-revision").textContent = entradas.filter(([, s]) => s.estado === "pendiente").length;
+
+    $("#lista-revision").innerHTML = entradas.length ? entradas.map(([id, s, r]) => {
+      const [ic, txt, clase] = ETIQUETAS[s.estado];
+      const foto = s.prueba && s.prueba.foto
+        ? `<img src="${s.prueba.foto}" alt="Prueba enviada para ${esc(r.titulo)}" class="mt-3 max-h-48 w-full rounded-lg object-cover">`
+        : "";
+      const acciones = s.estado === "pendiente"
+        ? `<div class="mt-3 flex gap-2">
+             <button data-aprobar="${id}" class="btn-cian flex-1 justify-center !py-2 !text-xs">Aprobar</button>
+             <button data-rechazar="${id}" class="btn-secundario flex-1 justify-center !py-2 !text-xs">Rechazar</button>
+           </div>`
+        : s.estado === "aprobado"
+          ? `<button data-rechazar="${id}" class="mt-3 text-xs text-white/35 underline underline-offset-4 hover:text-rojo-500">Revocar la aprobación</button>`
+          : "";
+
+      return `<article class="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <p class="font-semibold text-white">${r.icono} ${esc(r.titulo)}</p>
+            <p class="text-xs text-white/45">Enviado el ${esc(s.fecha)} · vale ${r.puntos} puntos</p>
+          </div>
+          <span class="shrink-0 rounded-full border px-2 py-0.5 text-[0.65rem] font-bold ${clase}">${ic} ${txt}</span>
+        </div>
+        ${s.prueba && s.prueba.texto ? `<p class="mt-3 rounded-lg bg-noche-950/60 p-3 text-sm text-white/75">${esc(s.prueba.texto)}</p>` : ""}
+        ${foto}
+        ${s.motivo ? `<p class="mt-2 text-xs text-rojo-500">Motivo: ${esc(s.motivo)}</p>` : ""}
+        ${acciones}
+      </article>`;
+    }).join("") : '<p class="text-sm text-white/35">Todavía no hay retos enviados.</p>';
   }
 
   /* ---------------------------------------------------------------- pendientes */
@@ -581,6 +817,13 @@
       </li>`).join("");
   }
 
+  function alternarPanelRevision(abrir) {
+    const panel = $("#panel-revision");
+    const visible = abrir !== undefined ? abrir : panel.classList.contains("hidden");
+    panel.classList.toggle("hidden", !visible);
+    if (visible) { pintarRevision(); $("#cerrar-revision").focus(); }
+  }
+
   function alternarPanelPendientes(abrir) {
     const panel = $("#panel-pendientes");
     const visible = abrir !== undefined ? abrir : panel.classList.contains("hidden");
@@ -593,11 +836,27 @@
 
   function conectarEventos() {
     document.addEventListener("click", (e) => {
+      // Los diálogos gestionan sus propios clics
+      if (e.target.closest("#modal-envio")) return;
+
       const nav = e.target.closest("[data-ir]");
       if (nav) { e.preventDefault(); ir(nav.dataset.ir); return; }
 
       const reto = e.target.closest("[data-reto]");
-      if (reto) { completarReto(reto.dataset.reto); return; }
+      if (reto) { abrirEnvio(reto.dataset.reto); return; }
+
+      const cancelar = e.target.closest("[data-cancelar]");
+      if (cancelar) { cancelarSolicitud(cancelar.dataset.cancelar); return; }
+
+      const aprobar = e.target.closest("[data-aprobar]");
+      if (aprobar) { resolverSolicitud(aprobar.dataset.aprobar, true); return; }
+
+      const rechazar = e.target.closest("[data-rechazar]");
+      if (rechazar) {
+        const motivo = prompt("Motivo del rechazo (opcional):") || "";
+        resolverSolicitud(rechazar.dataset.rechazar, false, motivo.trim());
+        return;
+      }
 
       const anuncio = e.target.closest("[data-anuncio]");
       if (anuncio) {
@@ -618,6 +877,34 @@
     $("#btn-asistencia").addEventListener("click", marcarAsistencia);
     $("#btn-pendientes").addEventListener("click", () => alternarPanelPendientes());
     $("#cerrar-pendientes").addEventListener("click", () => alternarPanelPendientes(false));
+    $("#btn-revision").addEventListener("click", () => alternarPanelRevision());
+    $("#cerrar-revision").addEventListener("click", () => alternarPanelRevision(false));
+    $("#cerrar-envio").addEventListener("click", cerrarEnvio);
+    $("#modal-envio").addEventListener("click", (e) => { if (e.target === $("#modal-envio")) cerrarEnvio(); });
+
+    $("#envio-foto").addEventListener("change", async (e) => {
+      const archivo = e.target.files && e.target.files[0];
+      const vista = $("#envio-vista");
+      if (!archivo) { fotoEnCurso = null; vista.classList.add("hidden"); return; }
+      try {
+        fotoEnCurso = await comprimirFoto(archivo);
+        vista.innerHTML = `<img src="${fotoEnCurso}" alt="Vista previa de la foto" class="max-h-40 w-full rounded-lg object-cover">`;
+        vista.classList.remove("hidden");
+      } catch (err) {
+        fotoEnCurso = null;
+        e.target.value = "";
+        vista.classList.add("hidden");
+        toast(err.message || "No se pudo usar esa foto");
+      }
+    });
+
+    $("#form-envio").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const texto = $("#envio-texto").value.trim();
+      if (!texto) return;
+      enviarSolicitud($("#form-envio").dataset.retoId, texto);
+      cerrarEnvio();
+    });
 
     $("#sel-equipo").addEventListener("change", (e) => {
       estado.equipo = e.target.value;
@@ -641,9 +928,10 @@
     });
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && !$("#panel-pendientes").classList.contains("hidden")) {
-        alternarPanelPendientes(false);
-      }
+      if (e.key !== "Escape") return;
+      if (!$("#modal-envio").classList.contains("hidden")) cerrarEnvio();
+      else if (!$("#panel-revision").classList.contains("hidden")) alternarPanelRevision(false);
+      else if (!$("#panel-pendientes").classList.contains("hidden")) alternarPanelPendientes(false);
     });
 
     window.addEventListener("hashchange", () => ir(location.hash.slice(1)));
@@ -661,11 +949,13 @@
     pintarAnuncios();
     pintarEquipos();
     pintarRetos();
+    pintarRevision();
     pintarPendientes();
     $("#modo-demo").checked = estado.demo;
   }
 
   cargar();
+  aplicarModoAdmin();
   pintarTodo();
   conectarEventos();
   ir(location.hash.slice(1) || "inicio");
